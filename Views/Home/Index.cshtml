@@ -1,7 +1,10 @@
 @using FishCast.ViewModels
 @using Microsoft.AspNetCore.Identity
 @using FishCast.Models
+@using FishCast.Data
+@using Microsoft.EntityFrameworkCore
 @inject UserManager<ApplicationUser> UserManager
+@inject AppDbContext Context
 @model FeedViewModel
 
 @{
@@ -228,10 +231,60 @@
                     <div class="profile-stat-item">
                         <a asp-controller="Perfil" asp-action="Seguindo" asp-route-userId="@currentUser.Id" style="text-decoration: none;">
                             <div class="profile-stat-n">@currentUser.Seguidos.Count</div>
-                            <div class="profile-stat-l">A seguir</div>
+                            <div class="profile-stat-l">Seguindo</div>
                         </a>
                     </div>
                 </div>
+            </div>
+        }
+
+        <!-- SUGESTÕES DE SEGUIDORES -->
+        @if (currentUser != null)
+        {
+            <div class="sidebar-card">
+                <div class="sidebar-title">👥 Sugestões para seguir</div>
+                @{
+                    // Carregar IDs dos seguidos do utilizador atual
+                    var seguidosIds = await Context.Seguidores
+                        .Where(s => s.SeguidorId == currentUser.Id)
+                        .Select(s => s.SeguidoId)
+                        .ToListAsync();
+
+                    var todosUtilizadores = Model.Capturas.Select(c => c.Utilizador).Where(u => u != null && u.Id != currentUser.Id).Distinct().ToList();
+                    var sugestoes = todosUtilizadores.Where(u => !seguidosIds.Contains(u.Id)).Take(3).ToList();
+                }
+                @if (sugestoes.Any())
+                {
+                    @foreach (var user in sugestoes)
+                    {
+                        <div class="suggested-user">
+                            <a asp-controller="Perfil" asp-action="Index" asp-route-userId="@user.Id">
+                                <img src="@(user.FotoPerfil ?? "/images/default-avatar.svg")" class="avatar-sm" alt="">
+                            </a>
+                            <div class="suggested-user-info">
+                                <div class="suggested-user-name">
+                                    <a asp-controller="Perfil" asp-action="Index" asp-route-userId="@user.Id" style="color: var(--foam); text-decoration: none;">
+                                        @(user.Nome ?? user.UserName)
+                                    </a>
+                                </div>
+                                @if (!string.IsNullOrEmpty(user.Localidade))
+                                {
+                                    <div style="font-size: 11px; color: var(--foam-muted);">@user.Localidade</div>
+                                }
+                            </div>
+                            <form asp-controller="Perfil" asp-action="Seguir" asp-route-userId="@user.Id" method="post" style="margin: 0;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-follow-sm">Seguir</button>
+                            </form>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div style="color: var(--foam-muted); font-size: 13px; padding: 8px 0;">
+                        Você já segue todos os pescadores! 🎣
+                    </div>
+                }
             </div>
         }
 

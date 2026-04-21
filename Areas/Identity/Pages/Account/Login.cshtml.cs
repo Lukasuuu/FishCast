@@ -55,26 +55,35 @@ namespace FishCast.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 ApplicationUser user = null;
-                
+                var input = Input.UsernameOrEmail.Trim();
+
                 // Tentar encontrar o usuário por email ou username
-                if (Input.UsernameOrEmail.Contains("@"))
+                if (input.Contains("@"))
                 {
-                    user = await _userManager.FindByEmailAsync(Input.UsernameOrEmail);
+                    // Tentar primeiro por email
+                    user = await _userManager.FindByEmailAsync(input);
+
+                    // Se não encontrou por email, tentar por username (caso alguém tenha @ no username)
+                    if (user == null)
+                    {
+                        user = await _userManager.FindByNameAsync(input);
+                    }
                 }
-                
-                if (user == null)
+                else
                 {
-                    user = await _userManager.FindByNameAsync(Input.UsernameOrEmail);
+                    // Sem @, tentar por username diretamente
+                    user = await _userManager.FindByNameAsync(input);
                 }
 
                 if (user == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Tentativa de login inválida.");
+                    ModelState.AddModelError(string.Empty, "Nome de utilizador/email ou password incorretos.");
                     return Page();
                 }
 
-                var result = await _signInManager.PasswordSignInAsync(user.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: true);
-                
+                // Usar o UserName normalizado do Identity para login
+                var result = await _signInManager.PasswordSignInAsync(user, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("Usuário conectado com sucesso.");
@@ -85,9 +94,13 @@ namespace FishCast.Areas.Identity.Pages.Account
                     _logger.LogWarning("Conta de usuário bloqueada.");
                     return RedirectToPage("./Lockout");
                 }
+                if (result.RequiresTwoFactor)
+                {
+                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Tentativa de login inválida.");
+                    ModelState.AddModelError(string.Empty, "Nome de utilizador/email ou password incorretos.");
                     return Page();
                 }
             }

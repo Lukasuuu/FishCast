@@ -808,9 +808,56 @@ body {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.5px;
     color: var(--foam-muted);
     margin-bottom: 1rem;
+}
+
+/* SUGGESTED USERS */
+.suggested-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--card-border);
+}
+
+    .suggested-user:last-child {
+        border-bottom: none;
+    }
+
+.suggested-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.suggested-user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--foam);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-follow-sm {
+    background: transparent;
+    border: 1px solid var(--coral);
+    color: var(--coral);
+    border-radius: 16px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+}
+
+    .btn-follow-sm:hover {
+        background: var(--coral);
+        color: #fff;
+    }
 }
 
 .my-profile-preview {
@@ -1383,7 +1430,8 @@ body {
 
 /* Search box for Peixe catalog - input and button side by side */
 .search-form-peixe {
-    display: block;
+    display: flex;
+    justify-content: center;
     margin-bottom: 1.5rem;
 }
 
@@ -1392,20 +1440,23 @@ body {
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
-    width: fit-content;
+    width: 100%;
+    max-width: 550px;
 }
 
 .search-input-peixe {
-    flex: 0 0 280px;
+    flex: 1;
+    min-width: 320px;
+    max-width: 500px;
     background: var(--input-bg);
     border: 1px solid var(--card-border);
     border-right: none;
     border-radius: var(--radius-sm) 0 0 var(--radius-sm);
     color: var(--foam);
-    height: 38px;
-    line-height: 36px;
-    padding: 0 12px;
-    font-size: 13px;
+    height: 42px;
+    line-height: 40px;
+    padding: 0 16px;
+    font-size: 14px;
     font-family: 'DM Sans', sans-serif;
     outline: none;
     margin: 0;
@@ -1418,16 +1469,16 @@ body {
     }
 
 .search-btn-peixe {
-    flex: 0 0 44px;
+    flex: 0 0 50px;
     background: var(--coral);
     border: 1px solid var(--coral);
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     color: #fff;
-    width: 44px;
-    height: 38px;
-    line-height: 36px;
+    width: 50px;
+    height: 42px;
+    line-height: 40px;
     padding: 0;
-    font-size: 14px;
+    font-size: 16px;
     cursor: pointer;
     text-align: center;
     margin: 0;
