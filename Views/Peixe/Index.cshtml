@@ -1,0 +1,80 @@
+@model FishCast.ViewModels.PeixeCatalogoViewModel
+
+@{
+    ViewData["Title"] = "Catálogo de Peixes - FishCast";
+}
+
+<div class="catalog-page">
+    <div class="catalog-header">
+        <h2><i class="bi bi-water"></i> Catálogo de Peixes</h2>
+
+        <div class="catalog-filters">
+            <a asp-action="Index" asp-route-filtroHabitat="" class="filter-chip @(string.IsNullOrEmpty(Model.FiltroHabitat) ? "active" : "")">Todos</a>
+            <a asp-action="Index" asp-route-filtroHabitat="Mar" class="filter-chip @(Model.FiltroHabitat == "Mar" ? "active" : "")">Mar</a>
+            <a asp-action="Index" asp-route-filtroHabitat="Rio" class="filter-chip @(Model.FiltroHabitat == "Rio" ? "active" : "")">Rio</a>
+            <a asp-action="Index" asp-route-filtroHabitat="Estuário" class="filter-chip @(Model.FiltroHabitat == "Estuário" ? "active" : "")">Estuário</a>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <form asp-action="Index" method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="termoPesquisa" value="@Model.TermoPesquisa" class="fc-input" placeholder="Pesquisar por nome ou nome científico..." />
+            <button type="submit" class="btn-coral" style="width: auto; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </form>
+
+    @if (Model.Peixes.Any())
+    {
+        <div class="fish-grid">
+            @foreach (var peixe in Model.Peixes)
+            {
+                <a asp-action="Details" asp-route-id="@peixe.Id" class="fish-card text-decoration-none">
+                    <div class="fish-card-img">
+                        @if (!string.IsNullOrEmpty(peixe.ImagemUrl))
+                        {
+                            <img src="@peixe.ImagemUrl" alt="@peixe.Nome" style="width: 100%; height: 100%; object-fit: cover;">
+                        }
+                        else
+                        {
+                            <i class="bi bi-water"></i>
+                        }
+                    </div>
+                    <div class="fish-card-body">
+                        <div class="fish-card-name">@peixe.Nome</div>
+                        @if (!string.IsNullOrEmpty(peixe.NomeCientifico))
+                        {
+                            <div class="fish-card-species">@peixe.NomeCientifico</div>
+                        }
+                        @if (!string.IsNullOrEmpty(peixe.HabitatTipo))
+                        {
+                            <span class="fish-card-tag @(peixe.HabitatTipo?.ToLower() switch {
+                                "mar" => "tag-fundo",
+                                "rio" => "tag-superficie",
+                                _ => "tag-costeiro"
+                            })">
+                                @peixe.HabitatTipo
+                            </span>
+                        }
+                        @if (peixe.TamanhoMedioCm.HasValue)
+                        {
+                            <span class="fish-card-tag tag-superficie" style="margin-left: 4px;">
+                                <i class="bi bi-rulers"></i> @peixe.TamanhoMedioCm cm
+                            </span>
+                        }
+                    </div>
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="bi bi-search"></i></div>
+            <h3>Nenhum peixe encontrado</h3>
+            <p>Tente ajustar os filtros ou a pesquisa.</p>
+        </div>
+    }
+</div>

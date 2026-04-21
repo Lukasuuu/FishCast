@@ -1,0 +1,108 @@
+@using Microsoft.AspNetCore.Identity
+@using FishCast.Models
+@inject UserManager<ApplicationUser> UserManager
+@model FishCast.ViewModels.PerfilViewModel
+
+@{
+    ViewData["Title"] = $"{Model.Utilizador.Nome ?? Model.Utilizador.UserName} - FishCast";
+    var avatarUrl = !string.IsNullOrEmpty(Model.Utilizador.FotoPerfil) ? Model.Utilizador.FotoPerfil : "/images/default-avatar.svg";
+}
+
+<div class="profile-page">
+    <!-- HERO -->
+    <div class="profile-hero">
+        <div class="profile-hero-content">
+            <img src="@avatarUrl" class="avatar-lg" alt="@Model.Utilizador.Nome" onerror="this.src='/images/default-avatar.svg'">
+
+            <div class="profile-info">
+                <div class="profile-name">@(Model.Utilizador.Nome ?? Model.Utilizador.UserName)</div>
+                <div class="profile-handle">@@@Model.Utilizador.UserName · @Model.Utilizador.Localidade</div>
+
+                @if (!string.IsNullOrEmpty(Model.Utilizador.Bio))
+                {
+                    <div class="profile-bio">@Model.Utilizador.Bio</div>
+                }
+
+                <div class="profile-stats-row">
+                    <a asp-action="Index" asp-route-userId="@Model.Utilizador.Id" class="prof-stat text-decoration-none">
+                        <div class="prof-stat-n">@Model.TotalCapturas</div>
+                        <div class="prof-stat-l">Capturas</div>
+                    </a>
+                    <a asp-action="Seguidores" asp-route-userId="@Model.Utilizador.Id" class="prof-stat text-decoration-none">
+                        <div class="prof-stat-n">@Model.SeguidoresCount</div>
+                        <div class="prof-stat-l">Seguidores</div>
+                    </a>
+                    <a asp-action="Seguindo" asp-route-userId="@Model.Utilizador.Id" class="prof-stat text-decoration-none">
+                        <div class="prof-stat-n">@Model.SeguindoCount</div>
+                        <div class="prof-stat-l">A seguir</div>
+                    </a>
+                </div>
+
+                <div class="profile-actions">
+                    @if (Model.IsOwnProfile)
+                    {
+                        <a asp-action="Editar" class="btn-edit-profile">
+                            <i class="bi bi-pencil"></i> Editar Perfil
+                        </a>
+                    }
+                    else if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <form asp-action="Seguir" asp-route-userId="@Model.Utilizador.Id" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn-coral" style="width: auto;">
+                                @if (Model.IsFollowing)
+                                {
+                                    <i class="bi bi-person-check"></i> @Html.Raw("A seguir")
+                                }
+                                else
+                                {
+                                    <i class="bi bi-person-plus"></i> @Html.Raw("Seguir")
+                                }
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="profile-tabs">
+        <div class="profile-tab active">
+            <i class="bi bi-grid"></i> Publicações
+        </div>
+    </div>
+
+    <!-- GRID -->
+    @if (Model.Capturas.Any())
+    {
+        <div class="capture-grid">
+            @foreach (var captura in Model.Capturas)
+            {
+                <a asp-controller="Captura" asp-action="Details" asp-route-id="@captura.Id" class="grid-item text-decoration-none">
+                    <img src="@captura.ImagemPath" alt="@captura.Titulo" onerror="this.src='/images/default-captura.svg'">
+                    <div class="grid-item-overlay">
+                        <i class="bi bi-heart-fill"></i>
+                        <span>@captura.Likes.Count</span>
+                        <i class="bi bi-chat-fill"></i>
+                        <span>@captura.Comentarios.Count</span>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">🎣</div>
+            <h3>Ainda não há publicações</h3>
+            <p>@(Model.IsOwnProfile ? "Partilhe a sua primeira pescaria!" : "Este pescador ainda não publicou nenhuma captura.") </p>
+            @if (Model.IsOwnProfile)
+            {
+                <a asp-controller="Captura" asp-action="Create" class="btn-coral mt-3" style="width: auto; display: inline-flex;">
+                    <i class="bi bi-camera"></i> Publicar Captura
+                </a>
+            }
+        </div>
+    }
+</div>

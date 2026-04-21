@@ -1,0 +1,180 @@
+@using Microsoft.AspNetCore.Identity
+@using FishCast.Models
+@inject UserManager<ApplicationUser> UserManager
+@model FishCast.ViewModels.CapturaDetailViewModel
+
+@{
+    ViewData["Title"] = Model.Captura.Titulo ?? "Detalhes da Captura";
+    var currentUser = await UserManager.GetUserAsync(User);
+}
+
+<div class="detail-page">
+    <div class="detail-grid">
+        <!-- Imagem -->
+        <div class="detail-image">
+            <img src="@Model.Captura.ImagemPath" alt="@Model.Captura.Titulo" onerror="this.src='/images/default-captura.svg'">
+        </div>
+
+        <!-- Info -->
+        <div class="detail-info">
+            <!-- Header -->
+            <div class="detail-header">
+                <a asp-controller="Perfil" asp-action="Index" asp-route-userId="@Model.Captura.UtilizadorId">
+                    @if (!string.IsNullOrEmpty(Model.Captura.Utilizador?.FotoPerfil))
+                    {
+                        <img src="@Model.Captura.Utilizador.FotoPerfil" class="avatar-md" alt="">
+                    }
+                    else
+                    {
+                        <img src="~/images/default-avatar.svg" class="avatar-md" alt="">
+                    }
+                </a>
+                <div class="flex-grow-1">
+                    <div style="font-weight: 600; color: var(--foam);">@(Model.Captura.Utilizador?.Nome ?? Model.Captura.Utilizador?.UserName ?? "Pescador")</div>
+                    <div style="font-size: 12px; color: var(--foam-muted);">
+                        @Model.Captura.DataHora.ToString("dd/MM/yyyy HH:mm") · @Model.Captura.Praia
+                    </div>
+                </div>
+
+                @if (Model.IsOwnCaptura)
+                {
+                    <div class="dropdown">
+                        <button class="btn btn-link text-white" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@Model.Captura.Id">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@Model.Captura.Id">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                }
+            </div>
+
+            <!-- Título e descrição -->
+            <h3 style="color: var(--foam); margin-bottom: 12px;">@Model.Captura.Titulo</h3>
+
+            @if (!string.IsNullOrEmpty(Model.Captura.Observacao))
+            {
+                <p style="color: var(--foam-muted); margin-bottom: 16px; line-height: 1.6;">@Model.Captura.Observacao</p>
+            }
+
+            <!-- Badges -->
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge-captura badge-peixe">
+                    <i class="bi bi-water"></i> @Model.Captura.Peixe?.Nome
+                    @if (!string.IsNullOrEmpty(Model.Captura.Peixe?.NomeCientifico))
+                    {
+                        <small>(@Model.Captura.Peixe.NomeCientifico)</small>
+                    }
+                </span>
+                @if (Model.Captura.PesoKg.HasValue)
+                {
+                    <span class="badge-captura badge-peso">
+                        <i class="bi bi-weight"></i> @Model.Captura.PesoKg.Value.ToString("F2") kg
+                    </span>
+                }
+                <span class="badge-captura badge-local">
+                    <i class="bi bi-geo-alt"></i> @Model.Captura.Praia
+                </span>
+                <span class="badge-captura badge-pesca">
+                    <i class="bi bi-fishing"></i> @Model.Captura.TipoPesca
+                </span>
+                @if (!string.IsNullOrEmpty(Model.Captura.Mare))
+                {
+                    <span class="badge-captura" style="background: rgba(144, 224, 239, 0.15); color: var(--cyan-light);">
+                        <i class="bi bi-moisture"></i> @Model.Captura.Mare
+                    </span>
+                }
+            </div>
+
+            <!-- Ações -->
+            <div class="detail-actions">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form asp-action="LikeToggle" asp-route-id="@Model.Captura.Id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="action-btn @(Model.IsLikedByCurrentUser ? "liked" : "")" style="flex: none; padding: 10px 20px;">
+                            <i class="bi @(Model.IsLikedByCurrentUser ? "bi-heart-fill" : "bi-heart")"></i>
+                            <span>@(Model.IsLikedByCurrentUser ? "Gosto dado" : "Gosto") (@Model.LikesCount)</span>
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" class="action-btn" style="flex: none; padding: 10px 20px;">
+                        <i class="bi bi-heart"></i>
+                        <span>@Model.LikesCount</span>
+                    </a>
+                }
+
+                <button class="action-btn" style="flex: none; padding: 10px 20px;">
+                    <i class="bi bi-chat"></i>
+                    <span>@Model.Comentarios.Count comentários</span>
+                </button>
+            </div>
+
+            <!-- Comentários -->
+            <div class="mt-4">
+                <h5 style="color: var(--foam); margin-bottom: 16px;">
+                    <i class="bi bi-chat-dots"></i> Comentários (@Model.Comentarios.Count)
+                </h5>
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form asp-action="Comentar" method="post" class="comment-input-wrap mb-4">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="capturaId" value="@Model.Captura.Id" />
+                        <img src="@(currentUser?.FotoPerfil ?? "/images/default-avatar.svg")" class="avatar-sm" alt="">
+                        <input type="text" name="texto" class="comment-input" placeholder="Escreva um comentário..." required maxlength="500" />
+                        <button type="submit" class="comment-send">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert mb-4" style="background: var(--surface); border-color: var(--card-border); color: var(--foam-muted);">
+                        <a asp-area="Identity" asp-page="/Account/Login" style="color: var(--coral);">Inicie sessão</a> para comentar.
+                    </div>
+                }
+
+                <div class="comment-section comments-scrollable">
+                    @foreach (var comentario in Model.Comentarios)
+                    {
+                        <div class="comment-item">
+                            <a asp-controller="Perfil" asp-action="Index" asp-route-userId="@comentario.UtilizadorId">
+                                <img src="@(comentario.FotoPerfilUtilizador ?? "/images/default-avatar.svg")" class="avatar-sm" alt="">
+                            </a>
+                            <div class="comment-bubble">
+                                <div class="comment-author">
+                                    <a asp-controller="Perfil" asp-action="Index" asp-route-userId="@comentario.UtilizadorId" style="color: var(--foam); text-decoration: none;">
+                                        @comentario.NomeUtilizador
+                                    </a>
+                                </div>
+                                <div class="comment-text">@comentario.Texto</div>
+                                <div style="font-size: 11px; color: var(--foam-muted); margin-top: 4px;">
+                                    @comentario.DataComentario.ToString("dd/MM/yyyy HH:mm")
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!Model.Comentarios.Any())
+                    {
+                        <div class="text-center py-3" style="color: var(--foam-muted);">
+                            <i class="bi bi-chat"></i> Ainda não há comentários. Seja o primeiro!
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,78 @@
+@using Microsoft.AspNetCore.Identity
+@using FishCast.Models
+@inject UserManager<ApplicationUser> UserManager
+@model FishCast.ViewModels.SeguidoresListViewModel
+
+@{
+    ViewData["Title"] = $"A seguir - {Model.UserName} - FishCast";
+    var currentUserId = UserManager.GetUserId(User);
+}
+
+<div class="profile-page">
+    <div class="mb-4">
+        <a asp-action="Index" asp-route-userId="@Model.UserId" class="text-decoration-none" style="color: var(--foam-muted);">
+            <i class="bi bi-arrow-left"></i> Voltar ao perfil
+        </a>
+    </div>
+
+    <div class="profile-hero mb-4">
+        <h3 style="color: var(--foam); margin: 0;">
+            <i class="bi bi-person-check"></i> @Model.UserName está a seguir
+        </h3>
+        <p style="color: var(--foam-muted); margin: 8px 0 0 0;">
+            @Model.Seguidores.Count pessoas
+        </p>
+    </div>
+
+    @if (Model.Seguidores.Any())
+    {
+        <div class="seguidores-list">
+            @foreach (var seguido in Model.Seguidores)
+            {
+                <div class="seguidor-item">
+                    <a asp-action="Index" asp-route-userId="@seguido.Id">
+                        <img src="@(seguido.FotoPerfil ?? "/images/default-avatar.svg")" class="avatar-sm" alt=""
+                             style="width: 48px; height: 48px;" onerror="this.src='/images/default-avatar.svg'">
+                    </a>
+                    <div class="seguidor-info">
+                        <div class="seguidor-name">
+                            <a asp-action="Index" asp-route-userId="@seguido.Id" style="color: var(--foam); text-decoration: none;">
+                                @seguido.Nome
+                            </a>
+                        </div>
+                        @if (!string.IsNullOrEmpty(seguido.Bio))
+                        {
+                            <div class="seguidor-bio">@seguido.Bio</div>
+                        }
+                        @if (!string.IsNullOrEmpty(seguido.Localidade))
+                        {
+                            <div style="font-size: 12px; color: var(--cyan-light);">
+                                <i class="bi bi-geo-alt"></i> @seguido.Localidade
+                            </div>
+                        }
+                    </div>
+                    @if (currentUserId != null)
+                    {
+                        <form asp-action="Seguir" asp-route-userId="@seguido.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn-follow following">
+                                <i class="bi bi-person-check"></i> Seguindo
+                            </button>
+                        </form>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="bi bi-person-plus"></i></div>
+            <h3>Ainda não segue ninguém</h3>
+            <p>Descubra outros pescadores para seguir!</p>
+            <a asp-controller="Explorar" asp-action="Index" class="btn-coral mt-3" style="width: auto; display: inline-flex;">
+                <i class="bi bi-compass"></i> Explorar
+            </a>
+        </div>
+    }
+</div>

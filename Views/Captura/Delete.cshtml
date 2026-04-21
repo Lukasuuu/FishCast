@@ -1,0 +1,67 @@
+@model FishCast.Models.Captura
+
+@{
+    ViewData["Title"] = "Eliminar Captura - FishCast";
+}
+
+<div class="create-page">
+    <div class="create-header">
+        <h2 style="color: #e74c3c;"><i class="bi bi-exclamation-triangle"></i> Eliminar Captura</h2>
+        <p style="color: var(--foam-muted);">Tem a certeza que deseja eliminar esta captura? Esta ação não pode ser desfeita.</p>
+    </div>
+
+    <div class="create-card">
+        <div class="p-4">
+            @if (!string.IsNullOrEmpty(Model.ImagemPath))
+            {
+                <div class="mb-4" style="border-radius: var(--radius); overflow: hidden;">
+                    <img src="@Model.ImagemPath" alt="@Model.Titulo" style="width: 100%; max-height: 400px; object-fit: cover;">
+                </div>
+            }
+
+            <h4 style="color: var(--foam); margin-bottom: 16px;">@Model.Titulo</h4>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong style="color: var(--foam-muted);">Espécie:</strong>
+                    <div style="color: var(--foam);">@Model.Peixe?.Nome</div>
+                </div>
+                <div class="col-md-6">
+                    <strong style="color: var(--foam-muted);">Peso:</strong>
+                    <div style="color: var(--foam);">@(Model.PesoKg?.ToString("F2") ?? "N/A") kg</div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong style="color: var(--foam-muted);">Praia:</strong>
+                    <div style="color: var(--foam);">@Model.Praia</div>
+                </div>
+                <div class="col-md-6">
+                    <strong style="color: var(--foam-muted);">Tipo de Pesca:</strong>
+                    <div style="color: var(--foam);">@Model.TipoPesca</div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong style="color: var(--foam-muted);">Data:</strong>
+                    <div style="color: var(--foam);">@Model.DataHora.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
+                <div class="col-md-6">
+                    <strong style="color: var(--foam-muted);">Comentários:</strong>
+                    <div style="color: var(--foam);">@Model.Comentarios.Count</div>
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="Delete" method="post" class="form-nav">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <a asp-action="Index" class="btn-outline-fc">Cancelar</a>
+            <button type="submit" class="btn-coral" style="background: #e74c3c;">
+                <i class="bi bi-trash"></i> Eliminar Definitivamente
+            </button>
+        </form>
+    </div>
+</div>

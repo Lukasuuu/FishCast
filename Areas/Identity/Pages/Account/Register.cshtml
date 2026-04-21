@@ -1,0 +1,64 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Registar - FishCast";
+    Layout = "_AuthLayout";
+}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-hero">
+            <div class="hook-big">🎣</div>
+            <h1>Criar Conta</h1>
+            <p>Junte-se à comunidade de pesca do Minho</p>
+        </div>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger-fc mb-3" role="alert"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Input.Nome" class="fc-label">Nome</label>
+                <input asp-for="Input.Nome" class="fc-input" autocomplete="name" aria-required="true" placeholder="O seu nome" />
+                <span asp-validation-for="Input.Nome" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Input.Email" class="fc-label">Email</label>
+                <input asp-for="Input.Email" type="email" class="fc-input" autocomplete="username" aria-required="true" placeholder="seu@email.pt" />
+                <span asp-validation-for="Input.Email" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Input.Password" class="fc-label">Palavra-passe</label>
+                <input asp-for="Input.Password" type="password" class="fc-input" autocomplete="new-password" aria-required="true" placeholder="Mínimo 6 caracteres" />
+                <span asp-validation-for="Input.Password" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label asp-for="Input.ConfirmPassword" class="fc-label">Confirmar Palavra-passe</label>
+                <input asp-for="Input.ConfirmPassword" type="password" class="fc-input" autocomplete="new-password" aria-required="true" placeholder="Repita a palavra-passe" />
+                <span asp-validation-for="Input.ConfirmPassword" class="field-validation-error"></span>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="btn-coral">
+                <i class="bi bi-person-plus"></i> Criar Conta
+            </button>
+
+            <div class="auth-divider">
+                <span>ou</span>
+            </div>
+
+            <a asp-page="./Login" class="btn-outline-fc text-center text-decoration-none" style="display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-box-arrow-in-right"></i> Já tem conta? Entrar
+            </a>
+        </form>
+
+        <div class="auth-link">
+            Ao registar-se, aceita os termos de utilização do FishCast.
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

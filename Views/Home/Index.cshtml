@@ -1,0 +1,261 @@
+@using FishCast.ViewModels
+@using Microsoft.AspNetCore.Identity
+@using FishCast.Models
+@inject UserManager<ApplicationUser> UserManager
+@model FeedViewModel
+
+@{
+    ViewData["Title"] = "Feed - FishCast";
+    var currentUser = await UserManager.GetUserAsync(User);
+}
+
+<!-- FILTERS -->
+<div class="filters-bar">
+    <form asp-action="Index" method="get" class="d-flex flex-wrap gap-3 align-items-center">
+        <div class="filter-group">
+            <label><i class="bi bi-geo-alt"></i> Praia:</label>
+            <select name="filtroPraia" class="filter-select" onchange="this.form.submit()">
+                <option value="">Todas</option>
+                @foreach (var praia in Model.Praias)
+                {
+                    if (Model.FiltroPraia == praia)
+                    {
+                        <option value="@praia" selected>@praia</option>
+                    }
+                    else
+                    {
+                        <option value="@praia">@praia</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label><i class="bi bi-water"></i> Espécie:</label>
+            <select name="filtroEspecie" class="filter-select" onchange="this.form.submit()">
+                <option value="">Todas</option>
+                @foreach (var especie in Model.Especies)
+                {
+                    if (Model.FiltroEspecie == especie.Id.ToString())
+                    {
+                        <option value="@especie.Id" selected>@especie.Nome</option>
+                    }
+                    else
+                    {
+                        <option value="@especie.Id">@especie.Nome</option>
+                    }
+                }
+            </select>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.FiltroPraia) || !string.IsNullOrEmpty(Model.FiltroEspecie))
+        {
+            <a asp-action="Index" class="btn-outline-fc" style="width: auto; padding: 6px 14px;">
+                <i class="bi bi-x-circle"></i> Limpar Filtros
+            </a>
+        }
+    </form>
+</div>
+
+<!-- FEED LAYOUT -->
+<div class="feed-layout">
+    <!-- MAIN FEED -->
+    <div>
+        @if (Model.Capturas.Any())
+        {
+            @foreach (var captura in Model.Capturas)
+            {
+                <div class="capture-card">
+                    <div class="card-header-fc">
+                        <a asp-controller="Perfil" asp-action="Index" asp-route-userId="@captura.UtilizadorId">
+                            @if (!string.IsNullOrEmpty(captura.Utilizador?.FotoPerfil))
+                            {
+                                <img src="@captura.Utilizador.FotoPerfil" class="avatar-md" alt="" style="width: 42px; height: 42px;">
+                            }
+                            else
+                            {
+                                <img src="~/images/default-avatar.svg" class="avatar-md" alt="" style="width: 42px; height: 42px;">
+                            }
+                        </a>
+                        <div class="card-user-info">
+                            <div class="card-user-name">@(captura.Utilizador?.Nome ?? captura.Utilizador?.UserName ?? "Pescador") @captura.Utilizador?.Localidade</div>
+                            <div class="card-meta">
+                                <i class="bi bi-clock"></i> @captura.DataHora.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-image-wrap">
+                        <img src="@captura.ImagemPath" alt="@captura.Titulo" onerror="this.src='/images/default-captura.svg'">
+                        <div class="card-fish-badge">
+                            <i class="bi bi-water"></i> @captura.Peixe?.Nome
+                        </div>
+                        <div class="card-stats-bar">
+                            <span class="stat-pill"><i class="bi bi-weight"></i> @(captura.PesoKg?.ToString("F1") ?? "?") kg</span>
+                            <span class="stat-pill"><i class="bi bi-geo-alt"></i> @captura.Praia</span>
+                            <span class="stat-pill"><i class="bi bi-fishing"></i> @captura.TipoPesca</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body-fc">
+                        <h5 class="mb-2" style="color: var(--foam); font-size: 15px;">@captura.Titulo</h5>
+
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="badge-captura badge-peixe"><i class="bi bi-water"></i> @captura.Peixe?.Nome</span>
+                            @if (captura.PesoKg.HasValue)
+                            {
+                                <span class="badge-captura badge-peso"><i class="bi bi-weight"></i> @captura.PesoKg.Value.ToString("F2") kg</span>
+                            }
+                            <span class="badge-captura badge-local"><i class="bi bi-geo-alt"></i> @captura.Praia</span>
+                            <span class="badge-captura badge-pesca"><i class="bi bi-fishing"></i> @captura.TipoPesca</span>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(captura.Observacao))
+                        {
+                            <div class="card-obs mb-3">@captura.Observacao</div>
+                        }
+
+                        <div class="card-actions">
+                            <form asp-controller="Captura" asp-action="LikeToggle" asp-route-id="@captura.Id" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="action-btn @(captura.Likes.Any(l => currentUser != null && l.UtilizadorId == currentUser.Id) ? "liked" : "")">
+                                    <i class="bi @(captura.Likes.Any(l => currentUser != null && l.UtilizadorId == currentUser.Id) ? "bi-heart-fill" : "bi-heart")"></i>
+                                    <span>@captura.Likes.Count</span>
+                                </button>
+                            </form>
+
+                            <a asp-controller="Captura" asp-action="Details" asp-route-id="@captura.Id" class="action-btn">
+                                <i class="bi bi-chat"></i>
+                                <span>@captura.Comentarios.Count</span>
+                            </a>
+
+                            <a asp-controller="Captura" asp-action="Details" asp-route-id="@captura.Id" class="action-btn">
+                                <i class="bi bi-eye"></i> Ver Detalhes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- PAGINAÇÃO -->
+            @if (Model.TotalPaginas > 1)
+            {
+                <div class="pagination-fc">
+                    @if (Model.PaginaAtual > 1)
+                    {
+                        <a asp-action="Index" asp-route-pagina="@(Model.PaginaAtual - 1)" asp-route-filtroPraia="@Model.FiltroPraia" asp-route-filtroEspecie="@Model.FiltroEspecie" class="page-link-fc">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    }
+
+                    @for (int i = 1; i <= Model.TotalPaginas; i++)
+                    {
+                        if (i == Model.PaginaAtual)
+                        {
+                            <span class="page-link-fc active">@i</span>
+                        }
+                        else if (i <= 3 || i > Model.TotalPaginas - 2 || Math.Abs(i - Model.PaginaAtual) <= 1)
+                        {
+                            <a asp-action="Index" asp-route-pagina="@i" asp-route-filtroPraia="@Model.FiltroPraia" asp-route-filtroEspecie="@Model.FiltroEspecie" class="page-link-fc">@i</a>
+                        }
+                        else if (i == 4 && Model.PaginaAtual > 5)
+                        {
+                            <span class="page-link-fc disabled">...</span>
+                        }
+                    }
+
+                    @if (Model.PaginaAtual < Model.TotalPaginas)
+                    {
+                        <a asp-action="Index" asp-route-pagina="@(Model.PaginaAtual + 1)" asp-route-filtroPraia="@Model.FiltroPraia" asp-route-filtroEspecie="@Model.FiltroEspecie" class="page-link-fc">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">🎣</div>
+                <h3>Ainda não há capturas</h3>
+                <p>Seja o primeiro a partilhar a sua pescaria!</p>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Captura" asp-action="Create" class="btn-coral mt-3" style="width: auto; display: inline-flex;">
+                        <i class="bi bi-camera"></i> Publicar Captura
+                    </a>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="feed-sidebar">
+        @if (currentUser != null)
+        {
+            <!-- MY PROFILE -->
+            <div class="sidebar-card">
+                <div class="my-profile-preview">
+                    <a asp-controller="Perfil" asp-action="Index">
+                        @if (!string.IsNullOrEmpty(currentUser.FotoPerfil))
+                        {
+                            <img src="@currentUser.FotoPerfil" class="avatar-md" alt="">
+                        }
+                        else
+                        {
+                            <img src="~/images/default-avatar.svg" class="avatar-md" alt="">
+                        }
+                    </a>
+                    <div>
+                        <div class="profile-info-name">@(currentUser.Nome ?? currentUser.UserName)</div>
+                        <div class="profile-info-sub">@currentUser.Localidade · @currentUser.TipoPescaFavorito</div>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="profile-stat-item">
+                        <a asp-controller="Captura" asp-action="Index" style="text-decoration: none;">
+                            <div class="profile-stat-n">@Model.Capturas.Count(c => c.UtilizadorId == currentUser.Id)</div>
+                            <div class="profile-stat-l">Capturas</div>
+                        </a>
+                    </div>
+                    <div class="profile-stat-item">
+                        <a asp-controller="Perfil" asp-action="Seguidores" asp-route-userId="@currentUser.Id" style="text-decoration: none;">
+                            <div class="profile-stat-n">@currentUser.Seguidores.Count</div>
+                            <div class="profile-stat-l">Seguidores</div>
+                        </a>
+                    </div>
+                    <div class="profile-stat-item">
+                        <a asp-controller="Perfil" asp-action="Seguindo" asp-route-userId="@currentUser.Id" style="text-decoration: none;">
+                            <div class="profile-stat-n">@currentUser.Seguidos.Count</div>
+                            <div class="profile-stat-l">A seguir</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- TOP PEIXES -->
+        <div class="sidebar-card">
+            <div class="sidebar-title">🏆 Mais capturados</div>
+            @{
+                var topPeixes = Model.Capturas
+                .GroupBy(c => c.Peixe?.Nome)
+                .OrderByDescending(g => g.Count())
+                .Take(5)
+                .ToList();
+            }
+            @foreach (var grupo in topPeixes)
+            {
+                <div class="top-fish-item">
+                    <span class="fish-name">@grupo.Key</span>
+                    <span class="fish-count">@grupo.Count() capturas</span>
+                </div>
+            }
+        </div>
+
+        <div style="font-size:11px;color:var(--foam-muted);line-height:1.6;padding:0 4px">
+            FishCast © 2026 · Viana do Castelo 🌊
+        </div>
+    </div>
+</div>

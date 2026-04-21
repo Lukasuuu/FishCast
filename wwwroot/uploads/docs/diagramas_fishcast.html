@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FishCast — Diagramas</title>
+<style>
+:root{
+  --blue:#1a6fc4;--blue-bg:#e8f1fb;--blue-bd:#a0c4f0;
+  --teal:#0f6e56;--teal-bg:#e1f5ee;--teal-bd:#5dcaa5;
+  --amber:#7a4f00;--amber-bg:#faeeda;--amber-bd:#ef9f27;
+  --purple:#3c3489;--purple-bg:#eeedfe;--purple-bd:#534ab7;
+  --coral:#993c1d;--coral-bg:#faece7;--coral-bd:#f0997b;
+  --gray:#444441;--gray-bg:#f1efe8;--gray-bd:#b4b2a9;
+  --green:#3b6d11;--green-bg:#eaf3de;--green-bd:#97c459;
+  --red:#a32d2d;--red-bg:#fcebeb;--red-bd:#f09595;
+  --pink:#993556;--pink-bg:#fbeaf0;--pink-bd:#ed93b1;
+  --bg:#fff;--surface:#f7f6f1;--border:#e0dfd8;
+  --text:#1a1a18;--muted:#6b6b65;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+@media(prefers-color-scheme:dark){:root{
+  --blue:#85b7eb;--blue-bg:#0c447c;--blue-bd:#378add;
+  --teal:#5dcaa5;--teal-bg:#085041;--teal-bd:#1d9e75;
+  --amber:#ef9f27;--amber-bg:#633806;--amber-bd:#ba7517;
+  --purple:#afa9ec;--purple-bg:#26215c;--purple-bd:#7f77dd;
+  --coral:#f0997b;--coral-bg:#4a1b0c;--coral-bd:#d85a30;
+  --gray:#b4b2a9;--gray-bg:#2c2c2a;--gray-bd:#5f5e5a;
+  --green:#97c459;--green-bg:#173404;--green-bd:#639922;
+  --red:#f7c1c1;--red-bg:#501313;--red-bd:#f09595;
+  --pink:#ed93b1;--pink-bg:#4b1528;--pink-bd:#d4537e;
+  --bg:#1a1a18;--surface:#222220;--border:#3a3a38;
+  --text:#e8e7e0;--muted:#9c9a92;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);padding:20px 14px;min-height:100vh}
+h1{font-size:21px;font-weight:600;margin-bottom:2px}
+.sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+
+/* TABS */
+.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:10px}
+.tab{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:13px;cursor:pointer;font-weight:500;transition:all .15s}
+.tab.on{background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue)}
+.panel{display:none}.panel.on{display:block}
+
+/* FLUXO nav */
+.fnav{display:flex;align-items:center;gap:0;margin-bottom:12px}
+.fdot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);flex-shrink:0;transition:all .2s}
+.fdot.on{background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue)}
+.fnl{flex:1;height:1px;background:var(--border)}
+.fph{display:none}.fph.on{display:block}
+.ptitle{font-size:15px;font-weight:600;margin-bottom:2px}
+.psub{font-size:13px;color:var(--muted);margin-bottom:12px}
+
+svg{width:100%;height:auto;display:block}
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+button{padding:7px 18px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-weight:500;transition:background .15s}
+button:hover{background:var(--border)}
+.cnt{font-size:13px;color:var(--muted)}
+
+/* legend */
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding:10px 14px;background:var(--surface);border-radius:10px;border:1px solid var(--border)}
+.leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.lsq{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+</style>
+</head>
+<body>
+<h1>FishCast — Diagramas do Projeto</h1>
+<p class="sub">Lucas Gonçalves · IEFP Braga · ASP.NET Core MVC + Identity + EF Core + SQL Server</p>
+
+<div class="tabs">
+  <button class="tab on" onclick="showTab('flux')">Fluxograma</button>
+  <button class="tab" onclick="showTab('class')">Diagrama de Classes</button>
+  <button class="tab" onclick="showTab('activ')">Diagrama de Atividades</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- FLUXOGRAMA                                                    -->
+<!-- ============================================================ -->
+<div id="flux" class="panel on">
+<div class="legend">
+  <span style="font-size:12px;font-weight:600;color:var(--muted);margin-right:4px">Legenda:</span>
+  <div class="leg"><div class="lsq" style="background:var(--coral-bd)"></div>Identity / Auth</div>
+  <div class="leg"><div class="lsq" style="background:var(--blue-bd)"></div>Controller / Action</div>
+  <div class="leg"><div class="lsq" style="background:var(--teal-bd)"></div>View (Razor)</div>
+  <div class="leg"><div class="lsq" style="background:var(--amber-bd)"></div>EF Core / BD</div>
+  <div class="leg"><div class="lsq" style="background:var(--purple-bd);border-radius:50%"></div>Decisão</div>
+  <div class="leg"><div class="lsq" style="background:var(--red-bd)"></div>Erro</div>
+</div>
+
+<div class="fnav">
+  <div class="fdot on" id="fd0" onclick="gf(0)">1</div><div class="fnl"></div>
+  <div class="fdot" id="fd1" onclick="gf(1)">2</div><div class="fnl"></div>
+  <div class="fdot" id="fd2" onclick="gf(2)">3</div><div class="fnl"></div>
+  <div class="fdot" id="fd3" onclick="gf(3)">4</div>
+</div>
+<div class="ptitle" id="fpt"></div>
+<div class="psub" id="fps"></div>
+
+<!-- FLUX 0: Startup + Auth -->
+<div class="fph on" id="fp0">
+<svg viewBox="0 0 680 400">
+<defs><marker id="mf0" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+<ellipse cx="340" cy="30" rx="100" ry="22" fill="var(--surface)" stroke="var(--border)" stroke-width="1"/>
+<text style="font:600 13px sans-serif;fill:var(--text)" x="340" y="30" text-anchor="middle" dominant-baseline="central">Program.cs — Startup</text>
+
+<line x1="340" y1="52" x2="340" y2="76" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf0)"/>
+
+<rect x="150" y="78" width="380" height="56" rx="10" fill="var(--coral-bg)" stroke="var(--coral-bd)" stroke-width="1"/>
+<text style="font:600 13px sans-serif;fill:var(--coral)" x="340" y="98" text-anchor="middle" dominant-baseline="central">Identity configurado</text>
+<text style="font:400 11px sans-serif;fill:var(--coral)" x="340" y="116" text-anchor="middle" dominant-baseline="central">ApplicationUser · RequireConfirmedAccount=false · RequireUniqueEmail=true</text>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="538" y="106" dominant-baseline="central">Identity</text>
+
+<line x1="340" y1="134" x2="340" y2="158" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf0)"/>
+
+<polygon points="340,160 440,194 340,228 240,194" fill="var(--purple-bg)" stroke="var(--purple-bd)" stroke-width="1"/>
+<text style="font:500 12px sans-serif;fill:var(--purple)" x="340" y="194" text-anchor="middle" dominant-baseline="central">Utilizador autenticado?</text>
+
+<!-- NO -->
+<line x1="240" y1="194" x2="148" y2="194" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf0)"/>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="194" y="186" text-anchor="middle">Não</text>
+<rect x="10" y="162" width="138" height="64" rx="8" fill="var(--coral-bg)" stroke="var(--coral-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--coral)" x="79" y="184" text-anchor="middle" dominant-baseline="central">Login / Register</text>
+<text style="font:400 10px sans-serif;fill:var(--coral)" x="79" y="200" text-anchor="middle" dominant-baseline="central">Identity Razor Pages</text>
+<text style="font:400 10px sans-serif;fill:var(--coral)" x="79" y="216" text-anchor="middle" dominant-baseline="central">Nome + Email + Password</text>
+
+<!-- YES -->
+<line x1="340" y1="228" x2="340" y2="262" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf0)"/>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="358" y="245" dominant-baseline="central">Sim</text>
+
+<rect x="200" y="264" width="280" height="52" rx="10" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+<text style="font:600 13px sans-serif;fill:var(--blue)" x="340" y="284" text-anchor="middle" dominant-baseline="central">HomeController.Index()</text>
+<text style="font:400 11px sans-serif;fill:var(--blue)" x="340" y="302" text-anchor="middle" dominant-baseline="central">feed de capturas + navbar</text>
+
+<line x1="340" y1="316" x2="340" y2="350" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf0)"/>
+<rect x="220" y="352" width="240" height="22" rx="6" fill="var(--green-bg)" stroke="var(--green-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--green)" x="340" y="363" text-anchor="middle" dominant-baseline="central">→ Fase 2: Registar Captura</text>
+</svg>
+</div>
+
+<!-- FLUX 1: Registar Captura -->
+<div class="fph" id="fp1">
+<svg viewBox="0 0 680 440">
+<defs><marker id="mf1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+<rect x="190" y="10" width="300" height="52" rx="10" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+<text style="font:600 13px sans-serif;fill:var(--blue)" x="340" y="30" text-anchor="middle" dominant-baseline="central">CapturaController</text>
+<text style="font:400 11px sans-serif;fill:var(--blue)" x="340" y="50" text-anchor="middle" dominant-baseline="central">[Authorize] — só utilizadores autenticados</text>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="498" y="36" dominant-baseline="central">Controller</text>
+
+<line x1="340" y1="62" x2="340" y2="86" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf1)"/>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="360" y="74" dominant-baseline="central">GET Create</text>
+
+<rect x="140" y="88" width="400" height="52" rx="10" fill="var(--teal-bg)" stroke="var(--teal-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--teal)" x="340" y="108" text-anchor="middle" dominant-baseline="central">View: Captura/Create.cshtml</text>
+<text style="font:400 11px sans-serif;fill:var(--teal)" x="340" y="126" text-anchor="middle" dominant-baseline="central">form: Peixe (dropdown) · Local · TipoPesca · Maré · Qtd · PesoKg · Foto</text>
+
+<line x1="340" y1="140" x2="340" y2="164" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf1)"/>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="360" y="152" dominant-baseline="central">POST</text>
+
+<polygon points="340,166 440,200 340,234 240,200" fill="var(--purple-bg)" stroke="var(--purple-bd)" stroke-width="1"/>
+<text style="font:500 12px sans-serif;fill:var(--purple)" x="340" y="200" text-anchor="middle" dominant-baseline="central">ModelState.IsValid?</text>
+
+<!-- NO -->
+<line x1="440" y1="200" x2="560" y2="200" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf1)"/>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="500" y="192" text-anchor="middle">Não</text>
+<rect x="562" y="178" width="108" height="44" rx="8" fill="var(--red-bg)" stroke="var(--red-bd)" stroke-width="1"/>
+<text style="font:500 12px sans-serif;fill:var(--red)" x="616" y="196" text-anchor="middle" dominant-baseline="central">return View</text>
+<text style="font:400 10px sans-serif;fill:var(--red)" x="616" y="212" text-anchor="middle" dominant-baseline="central">erros Razor</text>
+
+<!-- YES -->
+<line x1="340" y1="234" x2="340" y2="258" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf1)"/>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="358" y="246" dominant-baseline="central">Sim</text>
+
+<rect x="140" y="260" width="400" height="52" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--text)" x="340" y="280" text-anchor="middle" dominant-baseline="central">Upload da imagem (IFormFile)</text>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="340" y="298" text-anchor="middle" dominant-baseline="central">guarda em wwwroot/uploads/capturas · define ImagemPath</text>
+
+<line x1="340" y1="312" x2="340" y2="336" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf1)"/>
+
+<rect x="140" y="338" width="400" height="44" rx="10" fill="var(--amber-bg)" stroke="var(--amber-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--amber)" x="340" y="356" text-anchor="middle" dominant-baseline="central">EF Core: Capturas.Add() + SaveChangesAsync()</text>
+<text style="font:400 11px sans-serif;fill:var(--amber)" x="340" y="374" text-anchor="middle" dominant-baseline="central">persiste no SQL Server · define UtilizadorId = User.Id</text>
+
+<line x1="340" y1="382" x2="340" y2="416" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf1)"/>
+<rect x="220" y="418" width="240" height="18" rx="5" fill="var(--green-bg)" stroke="var(--green-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--green)" x="340" y="427" text-anchor="middle" dominant-baseline="central">→ Fase 3: Feed + Comentários</text>
+</svg>
+</div>
+
+<!-- FLUX 2: Feed + Comentários -->
+<div class="fph" id="fp2">
+<svg viewBox="0 0 680 390">
+<defs><marker id="mf2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+<rect x="170" y="10" width="340" height="52" rx="10" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+<text style="font:600 13px sans-serif;fill:var(--blue)" x="340" y="30" text-anchor="middle" dominant-baseline="central">HomeController.Index()</text>
+<text style="font:400 11px sans-serif;fill:var(--blue)" x="340" y="50" text-anchor="middle" dominant-baseline="central">carrega feed público de capturas</text>
+
+<line x1="340" y1="62" x2="340" y2="86" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf2)"/>
+
+<rect x="90" y="88" width="500" height="52" rx="10" fill="var(--amber-bg)" stroke="var(--amber-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--amber)" x="340" y="108" text-anchor="middle" dominant-baseline="central">EF Core: Capturas.Include(Utilizador).Include(Peixe).Include(Comentarios)</text>
+<text style="font:400 11px sans-serif;fill:var(--amber)" x="340" y="126" text-anchor="middle" dominant-baseline="central">ordenado por DataHora DESC · carrega foto e dados do peixe</text>
+
+<line x1="340" y1="140" x2="340" y2="164" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf2)"/>
+
+<rect x="130" y="166" width="420" height="44" rx="10" fill="var(--teal-bg)" stroke="var(--teal-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--teal)" x="340" y="184" text-anchor="middle" dominant-baseline="central">View: Home/Index.cshtml</text>
+<text style="font:400 11px sans-serif;fill:var(--teal)" x="340" y="202" text-anchor="middle" dominant-baseline="central">cards com foto · espécie · local · maré · comentários</text>
+
+<line x1="340" y1="210" x2="340" y2="234" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf2)"/>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="360" y="222" dominant-baseline="central">utilizador comenta</text>
+
+<!-- comentario flow -->
+<rect x="130" y="236" width="420" height="52" rx="10" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--blue)" x="340" y="256" text-anchor="middle" dominant-baseline="central">ComentarioController.Create() POST</text>
+<text style="font:400 11px sans-serif;fill:var(--blue)" x="340" y="274" text-anchor="middle" dominant-baseline="central">[Authorize] · define CapturaId + UtilizadorId + Texto</text>
+
+<line x1="340" y1="288" x2="340" y2="312" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf2)"/>
+
+<rect x="130" y="314" width="420" height="44" rx="10" fill="var(--amber-bg)" stroke="var(--amber-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--amber)" x="340" y="332" text-anchor="middle" dominant-baseline="central">EF Core: Comentarios.Add() + SaveChangesAsync()</text>
+<text style="font:400 11px sans-serif;fill:var(--amber)" x="340" y="350" text-anchor="middle" dominant-baseline="central">persiste no SQL Server → RedirectToAction("Index")</text>
+
+<line x1="340" y1="358" x2="340" y2="378" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf2)"/>
+<rect x="240" y="380" width="200" height="8" rx="3" fill="var(--green-bg)" stroke="var(--green-bd)" stroke-width="1"/>
+</svg>
+</div>
+
+<!-- FLUX 3: Perfil + Logout -->
+<div class="fph" id="fp3">
+<svg viewBox="0 0 680 340">
+<defs><marker id="mf3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+<text style="font:600 14px sans-serif;fill:var(--text)" x="160" y="18" text-anchor="middle" dominant-baseline="central">Perfil do utilizador</text>
+<text style="font:600 14px sans-serif;fill:var(--text)" x="520" y="18" text-anchor="middle" dominant-baseline="central">Logout</text>
+
+<!-- LEFT: Perfil -->
+<rect x="30" y="28" width="260" height="52" rx="10" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--blue)" x="160" y="48" text-anchor="middle" dominant-baseline="central">PerfilController.Index()</text>
+<text style="font:400 11px sans-serif;fill:var(--blue)" x="160" y="66" text-anchor="middle" dominant-baseline="central">[Authorize] · carrega ApplicationUser</text>
+
+<line x1="160" y1="80" x2="160" y2="104" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf3)"/>
+
+<rect x="30" y="106" width="260" height="52" rx="10" fill="var(--teal-bg)" stroke="var(--teal-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--teal)" x="160" y="126" text-anchor="middle" dominant-baseline="central">View: Perfil/Index.cshtml</text>
+<text style="font:400 11px sans-serif;fill:var(--teal)" x="160" y="144" text-anchor="middle" dominant-baseline="central">Nome · FotoPerfil · DataCriacao</text>
+
+<line x1="160" y1="158" x2="160" y2="182" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf3)"/>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="180" y="170" dominant-baseline="central">editar foto</text>
+
+<rect x="30" y="184" width="260" height="52" rx="10" fill="var(--amber-bg)" stroke="var(--amber-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--amber)" x="160" y="204" text-anchor="middle" dominant-baseline="central">Upload IFormFile</text>
+<text style="font:400 11px sans-serif;fill:var(--amber)" x="160" y="222" text-anchor="middle" dominant-baseline="central">wwwroot/uploads/perfis · SaveChangesAsync</text>
+
+<line x1="160" y1="236" x2="160" y2="270" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf3)"/>
+<!-- histórico capturas -->
+<rect x="30" y="272" width="260" height="52" rx="10" fill="var(--pink-bg)" stroke="var(--pink-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--pink)" x="160" y="292" text-anchor="middle" dominant-baseline="central">Histórico de capturas</text>
+<text style="font:400 11px sans-serif;fill:var(--pink)" x="160" y="310" text-anchor="middle" dominant-baseline="central">WHERE UtilizadorId = userId</text>
+
+<!-- RIGHT: Logout -->
+<rect x="390" y="28" width="260" height="52" rx="10" fill="var(--coral-bg)" stroke="var(--coral-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--coral)" x="520" y="48" text-anchor="middle" dominant-baseline="central">Logout.cshtml.cs</text>
+<text style="font:400 11px sans-serif;fill:var(--coral)" x="520" y="66" text-anchor="middle" dominant-baseline="central">Identity Razor Page</text>
+
+<line x1="520" y1="80" x2="520" y2="104" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf3)"/>
+
+<polygon points="520,106 600,132 520,158 440,132" fill="var(--purple-bg)" stroke="var(--purple-bd)" stroke-width="1"/>
+<text style="font:500 12px sans-serif;fill:var(--purple)" x="520" y="132" text-anchor="middle" dominant-baseline="central">Confirmar saída?</text>
+
+<line x1="600" y1="132" x2="644" y2="132" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf3)"/>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="622" y="124" text-anchor="middle">Não</text>
+<text style="font:600 14px sans-serif;fill:var(--muted)" x="658" y="132" text-anchor="middle" dominant-baseline="central">✕</text>
+
+<line x1="520" y1="158" x2="520" y2="182" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#mf3)"/>
+<text style="font:400 11px sans-serif;fill:var(--muted)" x="538" y="170" dominant-baseline="central">Sim</text>
+
+<rect x="390" y="184" width="260" height="52" rx="10" fill="var(--coral-bg)" stroke="var(--coral-bd)" stroke-width="1"/>
+<text style="font:600 12px sans-serif;fill:var(--coral)" x="520" y="204" text-anchor="middle" dominant-baseline="central">SignOutAsync()</text>
+<text style="font:400 11px sans-serif;fill:var(--coral)" x="520" y="222" text-anchor="middle" dominant-baseline="central">Session.Clear() → redireciona Home</text>
+</svg>
+</div>
+
+<div class="btn-row">
+  <button onclick="pf()">← Anterior</button>
+  <span class="cnt" id="fcnt">1 / 4</span>
+  <button onclick="nf()">Próximo →</button>
+</div>
+</div><!-- end flux panel -->
+
+<!-- ============================================================ -->
+<!-- DIAGRAMA DE CLASSES                                          -->
+<!-- ============================================================ -->
+<div id="class" class="panel">
+<svg viewBox="0 0 680 580">
+<defs><marker id="mc" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<!-- open triangle for inheritance -->
+<marker id="inh" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+  <path d="M0 0 L10 6 L0 12 Z" fill="var(--bg)" stroke="var(--border)" stroke-width="1.5"/>
+</marker>
+</defs>
+
+<!-- IdentityUser (top-left, gray) -->
+<g>
+  <rect x="20" y="20" width="180" height="110" rx="8" fill="var(--gray-bg)" stroke="var(--gray-bd)" stroke-width="1"/>
+  <rect x="20" y="20" width="180" height="28" rx="8" fill="var(--gray-bd)" stroke="var(--gray-bd)" stroke-width="0"/>
+  <rect x="20" y="40" width="180" height="8" fill="var(--gray-bd)" stroke="none"/>
+  <text style="font:600 12px sans-serif;fill:#fff" x="110" y="34" text-anchor="middle" dominant-baseline="central">«Identity» IdentityUser</text>
+  <line x1="20" y1="48" x2="200" y2="48" stroke="var(--gray-bd)" stroke-width="0.5"/>
+  <text style="font:400 11px sans-serif;fill:var(--gray)" x="30" y="64" dominant-baseline="central">+ Id : string</text>
+  <text style="font:400 11px sans-serif;fill:var(--gray)" x="30" y="82" dominant-baseline="central">+ Email : string</text>
+  <text style="font:400 11px sans-serif;fill:var(--gray)" x="30" y="100" dominant-baseline="central">+ UserName : string</text>
+  <text style="font:400 11px sans-serif;fill:var(--gray)" x="30" y="118" dominant-baseline="central">+ PasswordHash : string</text>
+</g>
+
+<!-- inheritance arrow: ApplicationUser extends IdentityUser -->
+<line x1="200" y1="75" x2="240" y2="75" stroke="var(--gray-bd)" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#inh)"/>
+
+<!-- ApplicationUser (top-center, coral) -->
+<g>
+  <rect x="240" y="20" width="200" height="130" rx="8" fill="var(--coral-bg)" stroke="var(--coral-bd)" stroke-width="1"/>
+  <rect x="240" y="20" width="200" height="28" rx="8" fill="var(--coral-bd)" stroke="none"/>
+  <rect x="240" y="40" width="200" height="8" fill="var(--coral-bd)" stroke="none"/>
+  <text style="font:600 12px sans-serif;fill:#fff" x="340" y="34" text-anchor="middle" dominant-baseline="central">ApplicationUser</text>
+  <line x1="240" y1="48" x2="440" y2="48" stroke="var(--coral-bd)" stroke-width="0.5"/>
+  <text style="font:400 11px sans-serif;fill:var(--coral)" x="250" y="64" dominant-baseline="central">+ Nome : string?</text>
+  <text style="font:400 11px sans-serif;fill:var(--coral)" x="250" y="82" dominant-baseline="central">+ FotoPerfil : string?</text>
+  <text style="font:400 11px sans-serif;fill:var(--coral)" x="250" y="100" dominant-baseline="central">+ DataCriacao : DateTime</text>
+  <line x1="240" y1="114" x2="440" y2="114" stroke="var(--coral-bd)" stroke-width="0.5"/>
+  <text style="font:400 10px sans-serif;fill:var(--muted)" x="250" y="128" dominant-baseline="central">«navigations»</text>
+  <text style="font:400 10px sans-serif;fill:var(--coral)" x="250" y="143" dominant-baseline="central">+ Capturas : ICollection&lt;Captura&gt;</text>
+</g>
+
+<!-- Peixe (top-right, amber) -->
+<g>
+  <rect x="480" y="20" width="190" height="130" rx="8" fill="var(--amber-bg)" stroke="var(--amber-bd)" stroke-width="1"/>
+  <rect x="480" y="20" width="190" height="28" rx="8" fill="var(--amber-bd)" stroke="none"/>
+  <rect x="480" y="40" width="190" height="8" fill="var(--amber-bd)" stroke="none"/>
+  <text style="font:600 12px sans-serif;fill:#fff" x="575" y="34" text-anchor="middle" dominant-baseline="central">Peixe</text>
+  <line x1="480" y1="48" x2="670" y2="48" stroke="var(--amber-bd)" stroke-width="0.5"/>
+  <text style="font:400 11px sans-serif;fill:var(--amber)" x="490" y="64" dominant-baseline="central">+ Id : int</text>
+  <text style="font:400 11px sans-serif;fill:var(--amber)" x="490" y="82" dominant-baseline="central">+ Nome : string?</text>
+  <text style="font:400 11px sans-serif;fill:var(--amber)" x="490" y="100" dominant-baseline="central">+ Tipo : string?</text>
+  <text style="font:400 11px sans-serif;fill:var(--amber)" x="490" y="118" dominant-baseline="central">+ Especie : string?</text>
+  <text style="font:400 11px sans-serif;fill:var(--amber)" x="490" y="136" dominant-baseline="central">+ TamanhoMedioCm : int?</text>
+</g>
+
+<!-- Captura (center, blue) -->
+<g>
+  <rect x="190" y="230" width="300" height="230" rx="8" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+  <rect x="190" y="230" width="300" height="28" rx="8" fill="var(--blue-bd)" stroke="none"/>
+  <rect x="190" y="250" width="300" height="8" fill="var(--blue-bd)" stroke="none"/>
+  <text style="font:600 13px sans-serif;fill:#fff" x="340" y="244" text-anchor="middle" dominant-baseline="central">Captura</text>
+  <line x1="190" y1="258" x2="490" y2="258" stroke="var(--blue-bd)" stroke-width="0.5"/>
+  <text style="font:400 11px sans-serif;fill:var(--blue)" x="200" y="274" dominant-baseline="central">+ Id : int  «PK»</text>
+  <text style="font:400 11px sans-serif;fill:var(--blue)" x="200" y="292" dominant-baseline="central">+ UtilizadorId : string?  «FK»</text>
+  <text style="font:400 11px sans-serif;fill:var(--blue)" x="200" y="310" dominant-baseline="central">+ PeixeId : int  «FK»</text>
+  <text style="font:400 11px sans-serif;fill:var(--blue)" x="200" y="328" dominant-baseline="central">+ Local : string?</text>
+  <text style="font:400 11px sans-serif;fill:var(--blue)" x="200" y="346" dominant-baseline="central">+ TipoPesca : string?</text>
+  <text style="font:400 11px sans-serif;fill:var(--blue)" x="200" y="364" dominant-baseline="central">+ Mare : string?</text>
+  <text style="font:400 11px sans-serif;fill:var(--blue)" x="200" y="382" dominant-baseline="central">+ DataHora : DateTime</text>
+  <text style="font:400 11px sans-serif;fill:var(--blue)" x="200" y="400" dominant-baseline="central">+ Quantidade : int</text>
+  <text style="font:400 11px sans-serif;fill:var(--blue)" x="200" y="418" dominant-baseline="central">+ PesoKg : decimal? [Precision(5,2)]</text>
+  <text style="font:400 11px sans-serif;fill:var(--blue)" x="200" y="436" dominant-baseline="central">+ Observacao : string?</text>
+  <text style="font:400 11px sans-serif;fill:var(--blue)" x="200" y="454" dominant-baseline="central">+ ImagemPath : string?</text>
+</g>
+
+<!-- Comentario (right-center, teal) -->
+<g>
+  <rect x="490" y="230" width="180" height="190" rx="8" fill="var(--teal-bg)" stroke="var(--teal-bd)" stroke-width="1"/>
+  <rect x="490" y="230" width="180" height="28" rx="8" fill="var(--teal-bd)" stroke="none"/>
+  <rect x="490" y="250" width="180" height="8" fill="var(--teal-bd)" stroke="none"/>
+  <text style="font:600 12px sans-serif;fill:#fff" x="580" y="244" text-anchor="middle" dominant-baseline="central">Comentario</text>
+  <line x1="490" y1="258" x2="670" y2="258" stroke="var(--teal-bd)" stroke-width="0.5"/>
+  <text style="font:400 11px sans-serif;fill:var(--teal)" x="500" y="274" dominant-baseline="central">+ Id : int  «PK»</text>
+  <text style="font:400 11px sans-serif;fill:var(--teal)" x="500" y="292" dominant-baseline="central">+ CapturaId : int  «FK»</text>
+  <text style="font:400 11px sans-serif;fill:var(--teal)" x="500" y="310" dominant-baseline="central">+ UtilizadorId : string?  «FK»</text>
+  <text style="font:400 11px sans-serif;fill:var(--teal)" x="500" y="328" dominant-baseline="central">+ Texto : string?</text>
+  <text style="font:400 11px sans-serif;fill:var(--teal)" x="500" y="346" dominant-baseline="central">+ DataComentario : DateTime</text>
+  <line x1="490" y1="360" x2="670" y2="360" stroke="var(--teal-bd)" stroke-width="0.5"/>
+  <text style="font:400 10px sans-serif;fill:var(--muted)" x="500" y="376" dominant-baseline="central">«navigations»</text>
+  <text style="font:400 10px sans-serif;fill:var(--teal)" x="500" y="394" dominant-baseline="central">+ Captura : Captura?</text>
+  <text style="font:400 10px sans-serif;fill:var(--teal)" x="500" y="412" dominant-baseline="central">+ Utilizador : ApplicationUser?</text>
+</g>
+
+<!-- AppDbContext (bottom, gray) -->
+<g>
+  <rect x="110" y="510" width="360" height="62" rx="8" fill="var(--gray-bg)" stroke="var(--gray-bd)" stroke-width="1"/>
+  <rect x="110" y="510" width="360" height="26" rx="8" fill="var(--gray-bd)" stroke="none"/>
+  <rect x="110" y="528" width="360" height="8" fill="var(--gray-bd)" stroke="none"/>
+  <text style="font:600 12px sans-serif;fill:#fff" x="290" y="523" text-anchor="middle" dominant-baseline="central">AppDbContext : IdentityDbContext&lt;ApplicationUser&gt;</text>
+  <line x1="110" y1="536" x2="470" y2="536" stroke="var(--gray-bd)" stroke-width="0.5"/>
+  <text style="font:400 11px sans-serif;fill:var(--gray)" x="120" y="550" dominant-baseline="central">DbSet&lt;Captura&gt; Capturas</text>
+  <text style="font:400 11px sans-serif;fill:var(--gray)" x="290" y="550" dominant-baseline="central">DbSet&lt;Comentario&gt; Comentarios</text>
+  <text style="font:400 11px sans-serif;fill:var(--gray)" x="120" y="566" dominant-baseline="central">DbSet&lt;Peixe&gt; Peixes</text>
+</g>
+
+<!-- RELATIONSHIP LINES -->
+<!-- ApplicationUser 1 ---- * Captura (uses) -->
+<line x1="340" y1="150" x2="340" y2="230" stroke="var(--blue-bd)" stroke-width="1.5" marker-end="url(#mc)"/>
+<text style="font:600 11px sans-serif;fill:var(--blue-bd)" x="328" y="183" dominant-baseline="central">1</text>
+<text style="font:600 11px sans-serif;fill:var(--blue-bd)" x="328" y="220" dominant-baseline="central">*</text>
+
+<!-- Peixe 1 ---- * Captura -->
+<line x1="530" y1="150" x2="430" y2="230" stroke="var(--amber-bd)" stroke-width="1.5" marker-end="url(#mc)"/>
+<text style="font:600 11px sans-serif;fill:var(--amber-bd)" x="528" y="170" dominant-baseline="central">1</text>
+<text style="font:600 11px sans-serif;fill:var(--amber-bd)" x="450" y="220" dominant-baseline="central">*</text>
+
+<!-- Captura 1 ---- * Comentario -->
+<line x1="490" y1="310" x2="490" y2="310" stroke="var(--teal-bd)" stroke-width="1.5"/>
+<text style="font:600 11px sans-serif;fill:var(--teal-bd)" x="476" y="300" dominant-baseline="central">1</text>
+<text style="font:600 11px sans-serif;fill:var(--teal-bd)" x="498" y="300" dominant-baseline="central">*</text>
+
+<!-- AppDbContext to Captura -->
+<line x1="290" y1="510" x2="290" y2="460" stroke="var(--gray-bd)" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#mc)"/>
+</svg>
+<p style="font-size:12px;color:var(--muted);margin-top:8px;padding:0 4px">As setas a tracejado indicam herança (IdentityUser→ApplicationUser) e uso (AppDbContext→entidades). As setas a cheio com rótulo indicam multiplicidade das relações.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- DIAGRAMA DE ATIVIDADES                                       -->
+<!-- ============================================================ -->
+<div id="activ" class="panel">
+<div class="legend">
+  <span style="font-size:12px;font-weight:600;color:var(--muted);margin-right:4px">Swimlanes:</span>
+  <div class="leg"><div class="lsq" style="background:var(--coral-bd)"></div>Utilizador (browser)</div>
+  <div class="leg"><div class="lsq" style="background:var(--blue-bd)"></div>ASP.NET Core (server)</div>
+  <div class="leg"><div class="lsq" style="background:var(--amber-bd)"></div>EF Core / SQL Server</div>
+</div>
+<svg viewBox="0 0 680 760">
+<defs><marker id="ma" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+<!-- SWIMLANE BACKGROUNDS -->
+<rect x="10" y="20" width="210" height="730" rx="8" fill="var(--coral-bg)" stroke="var(--coral-bd)" stroke-width="0.5" opacity="0.4"/>
+<rect x="230" y="20" width="220" height="730" rx="8" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="0.5" opacity="0.4"/>
+<rect x="460" y="20" width="210" height="730" rx="8" fill="var(--amber-bg)" stroke="var(--amber-bd)" stroke-width="0.5" opacity="0.4"/>
+
+<!-- SWIMLANE HEADERS -->
+<text style="font:600 12px sans-serif;fill:var(--coral)" x="115" y="36" text-anchor="middle" dominant-baseline="central">Utilizador</text>
+<text style="font:600 12px sans-serif;fill:var(--blue)" x="340" y="36" text-anchor="middle" dominant-baseline="central">ASP.NET Core</text>
+<text style="font:600 12px sans-serif;fill:var(--amber)" x="565" y="36" text-anchor="middle" dominant-baseline="central">EF Core / SQL Server</text>
+<line x1="10" y1="46" x2="670" y2="46" stroke="var(--border)" stroke-width="1"/>
+
+<!-- START -->
+<circle cx="115" cy="66" r="10" fill="var(--text)"/>
+
+<!-- 1: Acede ao site -->
+<line x1="115" y1="76" x2="115" y2="98" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="30" y="100" width="170" height="36" rx="8" fill="var(--coral-bg)" stroke="var(--coral-bd)" stroke-width="1"/>
+<text style="font:500 12px sans-serif;fill:var(--coral)" x="115" y="118" text-anchor="middle" dominant-baseline="central">Acede ao site</text>
+
+<!-- 2: Route -->
+<line x1="200" y1="118" x2="240" y2="118" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="242" y="100" width="196" height="36" rx="8" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--blue)" x="340" y="118" text-anchor="middle" dominant-baseline="central">Routing → HomeController.Index()</text>
+
+<!-- 3: Query BD -->
+<line x1="438" y1="118" x2="468" y2="118" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="470" y="100" width="190" height="36" rx="8" fill="var(--amber-bg)" stroke="var(--amber-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--amber)" x="565" y="118" text-anchor="middle" dominant-baseline="central">SELECT Capturas + Include</text>
+
+<!-- return -->
+<line x1="565" y1="136" x2="565" y2="158" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="470" y="160" width="190" height="36" rx="8" fill="var(--amber-bg)" stroke="var(--amber-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--amber)" x="565" y="178" text-anchor="middle" dominant-baseline="central">retorna List&lt;Captura&gt;</text>
+
+<line x1="470" y1="178" x2="438" y2="178" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="242" y="160" width="196" height="36" rx="8" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--blue)" x="340" y="178" text-anchor="middle" dominant-baseline="central">renderiza View(feed)</text>
+
+<line x1="242" y1="178" x2="200" y2="178" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="30" y="160" width="170" height="36" rx="8" fill="var(--coral-bg)" stroke="var(--coral-bd)" stroke-width="1"/>
+<text style="font:500 12px sans-serif;fill:var(--coral)" x="115" y="178" text-anchor="middle" dominant-baseline="central">vê feed de capturas</text>
+
+<!-- DECISION: autenticado? -->
+<line x1="115" y1="196" x2="115" y2="218" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<polygon points="115,220 175,248 115,276 55,248" fill="var(--purple-bg)" stroke="var(--purple-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--purple)" x="115" y="248" text-anchor="middle" dominant-baseline="central">Autenticado?</text>
+
+<!-- NO: Login -->
+<line x1="55" y1="248" x2="30" y2="248" stroke="var(--muted)" stroke-width="1.5"/>
+<line x1="30" y1="248" x2="30" y2="310" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<text style="font:400 10px sans-serif;fill:var(--muted)" x="38" y="266" dominant-baseline="central">Não → Login</text>
+
+<!-- YES: prossegue -->
+<line x1="115" y1="276" x2="115" y2="308" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<text style="font:400 10px sans-serif;fill:var(--muted)" x="120" y="292" dominant-baseline="central">Sim</text>
+
+<!-- FORK bar (parallel: Nova Captura ou Comentário) -->
+<rect x="40" y="310" width="150" height="6" rx="3" fill="var(--text)"/>
+<text style="font:400 10px sans-serif;fill:var(--muted)" x="115" y="326" text-anchor="middle" dominant-baseline="central">fork</text>
+
+<!-- LEFT branch: Registar Captura -->
+<line x1="70" y1="316" x2="70" y2="340" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="16" y="342" width="108" height="34" rx="6" fill="var(--coral-bg)" stroke="var(--coral-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--coral)" x="70" y="359" text-anchor="middle" dominant-baseline="central">preenche form</text>
+<text style="font:400 10px sans-serif;fill:var(--coral)" x="70" y="372" text-anchor="middle" dominant-baseline="central">captura + foto</text>
+
+<line x1="70" y1="376" x2="70" y2="398" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<line x1="124" y1="359" x2="242" y2="359" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+
+<!-- RIGHT branch: Comentar -->
+<line x1="160" y1="316" x2="160" y2="340" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="106" y="342" width="108" height="34" rx="6" fill="var(--coral-bg)" stroke="var(--coral-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--coral)" x="160" y="359" text-anchor="middle" dominant-baseline="central">escreve</text>
+<text style="font:400 10px sans-serif;fill:var(--coral)" x="160" y="372" text-anchor="middle" dominant-baseline="central">comentário</text>
+
+<!-- Server validates captura -->
+<rect x="242" y="342" width="196" height="34" rx="6" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--blue)" x="340" y="359" text-anchor="middle" dominant-baseline="central">POST Create · ModelState</text>
+
+<line x1="340" y1="376" x2="340" y2="398" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+
+<!-- DECISION ModelState -->
+<polygon points="340,400 400,422 340,444 280,422" fill="var(--purple-bg)" stroke="var(--purple-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--purple)" x="340" y="422" text-anchor="middle" dominant-baseline="central">IsValid?</text>
+
+<line x1="400" y1="422" x2="438" y2="422" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<text style="font:400 10px sans-serif;fill:var(--muted)" x="419" y="414" text-anchor="middle">Sim</text>
+
+<!-- Upload + BD -->
+<rect x="440" y="406" width="218" height="34" rx="6" fill="var(--amber-bg)" stroke="var(--amber-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--amber)" x="549" y="423" text-anchor="middle" dominant-baseline="central">Upload img + INSERT Captura</text>
+
+<line x1="549" y1="440" x2="549" y2="462" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="440" y="464" width="218" height="34" rx="6" fill="var(--amber-bg)" stroke="var(--amber-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--amber)" x="549" y="481" text-anchor="middle" dominant-baseline="central">SaveChangesAsync() ✓</text>
+
+<!-- Invalid path -->
+<line x1="280" y1="422" x2="242" y2="422" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<text style="font:400 10px sans-serif;fill:var(--muted)" x="261" y="414" text-anchor="middle">Não</text>
+<rect x="242" y="436" width="100" height="28" rx="6" fill="var(--red-bg)" stroke="var(--red-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--red)" x="292" y="450" text-anchor="middle" dominant-baseline="central">return View</text>
+
+<!-- JOIN bar -->
+<line x1="549" y1="498" x2="549" y2="528" stroke="var(--muted)" stroke-width="1.5"/>
+<line x1="340" y1="498" x2="340" y2="528" stroke="var(--muted)" stroke-width="1.5"/>
+<rect x="300" y="528" width="290" height="6" rx="3" fill="var(--text)" opacity="0.6"/>
+<text style="font:400 10px sans-serif;fill:var(--muted)" x="445" y="544" text-anchor="middle" dominant-baseline="central">join</text>
+
+<!-- Redirect to Index -->
+<line x1="340" y1="534" x2="340" y2="558" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="242" y="560" width="196" height="34" rx="6" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--blue)" x="340" y="577" text-anchor="middle" dominant-baseline="central">RedirectToAction("Index")</text>
+
+<line x1="242" y1="577" x2="200" y2="577" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="30" y="560" width="170" height="34" rx="6" fill="var(--coral-bg)" stroke="var(--coral-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--coral)" x="115" y="577" text-anchor="middle" dominant-baseline="central">vê feed atualizado</text>
+
+<!-- DECISION: logout? -->
+<line x1="115" y1="594" x2="115" y2="618" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<polygon points="115,620 175,648 115,676 55,648" fill="var(--purple-bg)" stroke="var(--purple-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--purple)" x="115" y="648" text-anchor="middle" dominant-baseline="central">Terminar sessão?</text>
+
+<line x1="55" y1="648" x2="30" y2="648" stroke="var(--muted)" stroke-width="1.5"/>
+<line x1="30" y1="648" x2="30" y2="726" stroke="var(--muted)" stroke-width="1.5"/>
+<text style="font:400 10px sans-serif;fill:var(--muted)" x="36" y="680" dominant-baseline="central">Não → continua</text>
+
+<line x1="175" y1="648" x2="242" y2="648" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<text style="font:400 10px sans-serif;fill:var(--muted)" x="209" y="640" text-anchor="middle">Sim</text>
+<rect x="242" y="630" width="196" height="36" rx="6" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--blue)" x="340" y="648" text-anchor="middle" dominant-baseline="central">SignOutAsync() + Session.Clear()</text>
+
+<line x1="340" y1="666" x2="340" y2="690" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+<rect x="242" y="692" width="196" height="30" rx="6" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1"/>
+<text style="font:500 11px sans-serif;fill:var(--blue)" x="340" y="707" text-anchor="middle" dominant-baseline="central">Redirect → Home</text>
+
+<!-- END -->
+<line x1="115" y1="676" x2="115" y2="714" stroke="var(--muted)" stroke-width="1.5"/>
+<line x1="30" y1="726" x2="115" y2="726" stroke="var(--muted)" stroke-width="1.5"/>
+<line x1="340" y1="722" x2="115" y2="726" stroke="var(--muted)" stroke-width="1.5"/>
+<line x1="115" y1="726" x2="115" y2="738" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ma)"/>
+
+<circle cx="115" cy="750" r="10" fill="none" stroke="var(--text)" stroke-width="2"/>
+<circle cx="115" cy="750" r="6" fill="var(--text)"/>
+</svg>
+<p style="font-size:12px;color:var(--muted);margin-top:8px;padding:0 4px">Os swimlanes separam responsabilidades: o Utilizador interage no browser, o ASP.NET Core trata routing/validação, o EF Core persiste no SQL Server.</p>
+</div>
+
+<script>
+// TABS
+function showTab(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  event.target.classList.add('on');
+}
+
+// FLUXO
+const FD=[
+  {t:"Fase 1 — Startup e Autenticação",s:"Program.cs configura Identity · Login/Register com ApplicationUser personalizado"},
+  {t:"Fase 2 — Registar Captura",s:"CapturaController [Authorize] · form com foto · ModelState · upload para wwwroot · EF Core INSERT"},
+  {t:"Fase 3 — Feed e Comentários",s:"Include encadeado · feed público de capturas · ComentarioController com [Authorize]"},
+  {t:"Fase 4 — Perfil e Logout",s:"Perfil com FotoPerfil + histórico · Identity SignOutAsync + Session.Clear()"},
+];
+let fc=0;
+function gf(i){
+  document.querySelectorAll('.fph').forEach((p,j)=>p.classList.toggle('on',j===i));
+  document.querySelectorAll('.fdot').forEach((d,j)=>d.classList.toggle('on',j===i));
+  document.getElementById('fpt').textContent=FD[i].t;
+  document.getElementById('fps').textContent=FD[i].s;
+  document.getElementById('fcnt').textContent=(i+1)+' / 4';
+  fc=i;
+}
+function pf(){if(fc>0)gf(fc-1);}
+function nf(){if(fc<3)gf(fc+1);}
+gf(0);
+</script>
+</body>
+</html>

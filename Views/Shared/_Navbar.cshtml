@@ -1,0 +1,87 @@
+@using Microsoft.AspNetCore.Identity
+@using FishCast.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    var user = User.Identity?.IsAuthenticated == true ? await UserManager.GetUserAsync(User) : null;
+}
+
+<nav class="navbar-fishcast" id="mainNav">
+    <!-- LOGO -->
+    <a class="navbar-brand-fc" asp-controller="Home" asp-action="Index">
+        <div class="hook">🎣</div>
+        <span class="brand-font">FishCast</span>
+    </a>
+
+    <!-- NAV LINKS -->
+    <div class="nav-links d-none d-md-flex" style="gap: 8px;">
+        <a class="nav-btn" asp-controller="Home" asp-action="Index" title="Feed">
+            <i class="bi bi-house-fill"></i>
+        </a>
+        <a class="nav-btn" asp-controller="Explorar" asp-action="Index" title="Explorar">
+            <i class="bi bi-compass"></i>
+        </a>
+        <a class="nav-btn" asp-controller="Peixe" asp-action="Index" title="Peixes">
+            <i class="bi bi-water"></i>
+        </a>
+    </div>
+
+    <div class="nav-actions">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <!-- UTILIZADOR LOGADO -->
+            <div style="display:flex;align-items:center;gap:8px">
+                <a class="btn-post-nav" asp-controller="Captura" asp-action="Create">
+                    <i class="bi bi-camera"></i> Publicar +
+                </a>
+
+                <!-- FOTO PERFIL -->
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
+                        @if (!string.IsNullOrEmpty(user?.FotoPerfil))
+                        {
+                            <img src="@user.FotoPerfil" class="avatar-sm" alt="Perfil">
+                        }
+                        else
+                        {
+                            <img src="~/images/default-avatar.svg" class="avatar-sm" alt="Perfil" onerror="this.src='/images/default-avatar.svg'">
+                        }
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" style="background: var(--ocean-navy); border-color: var(--card-border);">
+                        <li>
+                            <a class="dropdown-item" asp-controller="Perfil" asp-action="Index" style="color: var(--white);">
+                                <i class="bi bi-person"></i> Meu Perfil
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="Captura" asp-action="Index" style="color: var(--white);">
+                                <i class="bi bi-collection"></i> Minhas Capturas
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider" style="border-color: var(--card-border);"></li>
+                        <li>
+                            <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                <button type="submit" class="dropdown-item" style="color: var(--coral); border: none; background: none; width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i> Sair
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- UTILIZADOR NÃO LOGADO -->
+            <div style="display:flex;gap:8px;align-items:center">
+                <a class="btn-outline-fc" asp-area="Identity" asp-page="/Account/Login">
+                    Entrar
+                </a>
+                <a class="btn-coral" asp-area="Identity" asp-page="/Account/Register">
+                    Registar
+                </a>
+            </div>
+        }
+    </div>
+</nav>
