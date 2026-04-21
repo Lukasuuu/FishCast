@@ -23,8 +23,15 @@
             </div>
 
             <div class="form-group mb-3">
+                <label asp-for="Input.Username" class="fc-label">Nome de utilizador</label>
+                <input asp-for="Input.Username" class="fc-input" autocomplete="username" aria-required="true" placeholder="ex: joaopescador" />
+                <span asp-validation-for="Input.Username" class="field-validation-error"></span>
+                <small class="form-text" style="color: var(--foam-muted); font-size: 12px;">Use apenas letras, números e underscores. Será o seu identificador único.</small>
+            </div>
+
+            <div class="form-group mb-3">
                 <label asp-for="Input.Email" class="fc-label">Email</label>
-                <input asp-for="Input.Email" type="email" class="fc-input" autocomplete="username" aria-required="true" placeholder="seu@email.pt" />
+                <input asp-for="Input.Email" type="email" class="fc-input" autocomplete="email" aria-required="true" placeholder="seu@email.pt" />
                 <span asp-validation-for="Input.Email" class="field-validation-error"></span>
             </div>
 

@@ -90,9 +90,11 @@ body {
     }
 
 .nav-search {
-    flex: 1;
-    max-width: 320px;
+    flex: 0 1 auto;
+    width: 280px;
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
     .nav-search input {
@@ -100,10 +102,12 @@ body {
         border: 1px solid var(--card-border);
         border-radius: 24px;
         color: var(--foam);
-        padding: 7px 14px 7px 36px;
+        padding: 8px 14px 8px 38px;
         width: 100%;
         font-size: 13px;
         font-family: 'DM Sans', sans-serif;
+        line-height: 1.4;
+        height: 38px;
     }
 
         .nav-search input::placeholder {
@@ -118,11 +122,13 @@ body {
 
     .nav-search i {
         position: absolute;
-        left: 12px;
+        left: 13px;
         top: 50%;
         transform: translateY(-50%);
         color: var(--foam-muted);
         font-size: 14px;
+        line-height: 1;
+        pointer-events: none;
     }
 
 .nav-actions {
@@ -698,14 +704,16 @@ body {
         font-size: 16px;
     }
 
-.comment-section {
+.comment-section,
+.comments-scrollable {
     padding: 0 16px 14px;
     max-height: 400px;
     overflow-y: auto;
 }
 
 @media (max-width: 768px) {
-    .comment-section {
+    .comment-section,
+    .comments-scrollable {
         max-height: none;
         overflow-y: visible;
     }

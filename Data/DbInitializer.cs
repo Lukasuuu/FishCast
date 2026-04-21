@@ -133,24 +133,25 @@ namespace FishCast.Data
                 await context.SaveChangesAsync();
             }
 
-            // Seed Utilizadores
-            var utilizadoresSeed = new List<(string Email, string Password, string Nome, string Localidade, string TipoPesca, string Bio)>
+            // Seed Utilizadores (Email, Password, Nome, Username, Localidade, TipoPesca, Bio)
+            var utilizadoresSeed = new List<(string Email, string Password, string Nome, string Username, string Localidade, string TipoPesca, string Bio)>
             {
-                ("joaominhoto@fishcast.pt", "Pesca@2026!", "João Minhoto", "Cabedelo", "Surf Casting", "Pescador apaixonado pelo Cabedelo. Sempre em busca do Robalo perfeito!"),
-                ("mariapesca@fishcast.pt", "Pesca@2026!", "Maria Pesca", "Âncora", "Pesca à Bóia", "Amante da pesca em família nas praias do Alto Minho."),
-                ("pedroviana@fishcast.pt", "Pesca@2026!", "Pedro Viana", "Viana do Castelo", "Mar", "Pescador desde criança. Conheço cada pedra da costa vianense."),
-                ("anaribeiro@fishcast.pt", "Pesca@2026!", "Ana Ribeiro", "Afife", "Surf Casting", "A única mulher do grupo de pesca local. Representando as mulheres no mar!"),
-                ("ruisurfcast@fishcast.pt", "Pesca@2026!", "Rui Surfcast", "Moledo", "Lure", "Especialista em pesca com iscas artificiais. Moledo é o meu quintal.")
+                ("joaominhoto@fishcast.pt", "Pesca@2026!", "João Minhoto", "joaominhoto", "Cabedelo", "Surf Casting", "Pescador apaixonado pelo Cabedelo. Sempre em busca do Robalo perfeito!"),
+                ("mariapesca@fishcast.pt", "Pesca@2026!", "Maria Pesca", "mariapesca", "Âncora", "Pesca à Bóia", "Amante da pesca em família nas praias do Alto Minho."),
+                ("pedroviana@fishcast.pt", "Pesca@2026!", "Pedro Viana", "pedroviana", "Viana do Castelo", "Mar", "Pescador desde criança. Conheço cada pedra da costa vianense."),
+                ("anaribeiro@fishcast.pt", "Pesca@2026!", "Ana Ribeiro", "anaribeiro", "Afife", "Surf Casting", "A única mulher do grupo de pesca local. Representando as mulheres no mar!"),
+                ("ruisurfcast@fishcast.pt", "Pesca@2026!", "Rui Surfcast", "ruisurfcast", "Moledo", "Lure", "Especialista em pesca com iscas artificiais. Moledo é o meu quintal."),
+                ("lukasu@fishcast.pt", "Pesca@2026!", "Lukasu", "lukasu", "Viana do Castelo", "Surf Casting", "Entusiasta da pesca e desenvolvedor do FishCast. 🎣")
             };
 
             var users = new List<ApplicationUser>();
-            foreach (var (email, password, nome, localidade, tipoPesca, bio) in utilizadoresSeed)
+            foreach (var (email, password, nome, username, localidade, tipoPesca, bio) in utilizadoresSeed)
             {
-                if (await userManager.FindByEmailAsync(email) == null)
+                if (await userManager.FindByEmailAsync(email) == null && await userManager.FindByNameAsync(username) == null)
                 {
                     var user = new ApplicationUser
                     {
-                        UserName = email,
+                        UserName = username,
                         Email = email,
                         Nome = nome,
                         Localidade = localidade,
@@ -168,7 +169,7 @@ namespace FishCast.Data
                 }
                 else
                 {
-                    users.Add(await userManager.FindByEmailAsync(email));
+                    users.Add(await userManager.FindByEmailAsync(email) ?? await userManager.FindByNameAsync(username));
                 }
             }
 

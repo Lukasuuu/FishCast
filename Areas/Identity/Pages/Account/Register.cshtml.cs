@@ -68,6 +68,13 @@
                 [Display(Name = "Nome")]
                 public string Nome { get; set; }
 
+                // Campo de nome de usuário - obrigatório
+                [Required(ErrorMessage = "O nome de utilizador é obrigatório.")]
+                [StringLength(30, ErrorMessage = "O nome de utilizador deve ter entre {2} e {1} caracteres.", MinimumLength = 3)]
+                [RegularExpression("^[a-zA-Z0-9_]+$", ErrorMessage = "O nome de utilizador só pode conter letras, números e underscores.")]
+                [Display(Name = "Nome de utilizador")]
+                public string Username { get; set; }
+
                 // Campo de e-mail - obrigatório
                 [Required(ErrorMessage = "O e-mail é obrigatório.")]
                 [EmailAddress(ErrorMessage = "O e-mail não é válido.")]
@@ -111,8 +118,8 @@
                     // Cria uma nova instância do usuário
                     var user = CreateUser();
 
-                    // Define o nome de usuário como o e-mail fornecido
-                    await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                    // Define o nome de usuário (username) separado do email
+                    await _userStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);
                     // Define o e-mail do usuário
                     await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                     // Define o nome do usuário

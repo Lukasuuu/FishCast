@@ -361,3 +361,13 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# ASP.NET Core User Secrets
+**/appsettings.Development.json
+**/appsettings.Production.json
+secrets.json
+
+# Environment configuration files
+*.env
+.env.*
+configurar-ambiente-com-password.bat

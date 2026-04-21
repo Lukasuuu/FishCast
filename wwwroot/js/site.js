@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isAvatar = this.classList.contains('avatar-sm') ||
                     this.classList.contains('avatar-md') ||
                     this.classList.contains('avatar-lg');
-                this.src = isAvatar ? '/images/default-avatar.png' : '/images/default-captura.jpg';
+                this.src = isAvatar ? '/images/default-avatar.svg' : '/images/default-captura.svg';
             }
         });
     });

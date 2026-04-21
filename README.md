@@ -58,6 +58,7 @@ A aplicação permite aos pescadores:
 
 ### 👤 Utilizadores
 - ✅ Registo e autenticação completa com Identity
+- ✅ Login com Email ou Nome de utilizador (estilo Instagram)
 - ✅ Perfil personalizado com foto, bio e localidade
 - ✅ Sistema de seguidores (seguir/deixar de seguir)
 - ✅ Lista de seguidores e seguindo
@@ -139,12 +140,12 @@ A aplicação permite aos pescadores:
    ```
 
 3. **Configurar a base de dados**
-   
-   A connection string já está configurada para LocalDB em `appsettings.json`:
-   ```json
-   "ConnectionStrings": {
-     "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=FishCast;Trusted_Connection=True;MultipleActiveResultSets=true"
-   }
+
+   Por padrão, a connection string aponta para LocalDB. Para usar SQL Server remoto, veja [CONEXAO.md](CONEXAO.md).
+
+   Para configurar via variável de ambiente (recomendado para produção):
+   ```powershell
+   [Environment]::SetEnvironmentVariable("ConnectionStrings__DefaultConnection", "sua-string-de-conexao", "Machine")
    ```
 
 4. **Aplicar migrações e criar base de dados**
@@ -168,10 +169,10 @@ A aplicação permite aos pescadores:
 
 1. Ao iniciar pela primeira vez, a base de dados é automaticamente populada com:
    - 10 espécies de peixes
-   - 5 utilizadores de teste
+   - 6 utilizadores de teste
    - 20 capturas de exemplo
 
-2. Faça login com uma das contas de teste abaixo 👇
+2. Faça login com uma das contas de teste abaixo 👇 (pode usar Email ou Username)
 
 ### Fluxo Típico
 
@@ -186,16 +187,19 @@ A aplicação permite aos pescadores:
 
 ## 🔑 Contas de Teste
 
-Utilize estas credenciais para testar a aplicação:
+Utilize estas credenciais para testar a aplicação. Pode fazer login com **Email** ou **Nome de utilizador** (como no Instagram).
 
-| Email | Password | Nome | Localidade | Tipo Preferido |
-|-------|----------|------|------------|----------------|
-| `joaominhoto@fishcast.pt` | `Pesca@2026!` | João Minhoto | Cabedelo | Surf Casting |
-| `mariapesca@fishcast.pt` | `Pesca@2026!` | Maria Pesca | Âncora | Pesca à Bóia |
-| `pedroviana@fishcast.pt` | `Pesca@2026!` | Pedro Viana | Viana do Castelo | Mar |
-| `anaribeiro@fishcast.pt` | `Pesca@2026!` | Ana Ribeiro | Afife | Surf Casting |
-| `ruisurfcast@fishcast.pt` | `Pesca@2026!` | Rui Surfcast | Moledo | Lure |
+| Email | Username | Password | Nome | Localidade | Tipo Preferido |
+|-------|----------|----------|------|------------|----------------|
+| `joaominhoto@fishcast.pt` | `joaominhoto` | `Pesca@2026!` | João Minhoto | Cabedelo | Surf Casting |
+| `mariapesca@fishcast.pt` | `mariapesca` | `Pesca@2026!` | Maria Pesca | Âncora | Pesca à Bóia |
+| `pedroviana@fishcast.pt` | `pedroviana` | `Pesca@2026!` | Pedro Viana | Viana do Castelo | Mar |
+| `anaribeiro@fishcast.pt` | `anaribeiro` | `Pesca@2026!` | Ana Ribeiro | Afife | Surf Casting |
+| `ruisurfcast@fishcast.pt` | `ruisurfcast` | `Pesca@2026!` | Rui Surfcast | Moledo | Lure |
+| `lukasu@fishcast.pt` | `lukasu` | `Pesca@2026!` | Lukasu | Viana do Castelo | Surf Casting |
 
+> 💡 **Dica:** Pode fazer login tanto com o email (ex: `joaominhoto@fishcast.pt`) quanto com o username (ex: `joaominhoto`).
+>
 > ⚠️ Todas as contas têm a mesma password: `Pesca@2026!`
 
 ---
