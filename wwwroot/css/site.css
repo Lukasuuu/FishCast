@@ -1381,6 +1381,66 @@ body {
     flex-wrap: wrap;
 }
 
+/* Search box for Peixe catalog - input and button side by side */
+.search-form-peixe {
+    display: block;
+    margin-bottom: 1.5rem;
+}
+
+.search-box-peixe {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: fit-content;
+}
+
+.search-input-peixe {
+    flex: 0 0 280px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-right: none;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    color: var(--foam);
+    height: 38px;
+    line-height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+    .search-input-peixe:focus {
+        border-color: var(--coral);
+        background: rgba(6,14,26,0.8);
+    }
+
+.search-btn-peixe {
+    flex: 0 0 44px;
+    background: var(--coral);
+    border: 1px solid var(--coral);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: #fff;
+    width: 44px;
+    height: 38px;
+    line-height: 36px;
+    padding: 0;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    margin: 0;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .search-btn-peixe:hover {
+        background: var(--coral-light);
+    }
+
 .filter-chip {
     padding: 6px 14px;
     border-radius: 20px;

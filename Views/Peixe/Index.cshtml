@@ -17,14 +17,7 @@
     </div>
 
     <!-- Search -->
-    <form asp-action="Index" method="get" class="mb-4">
-        <div class="input-group">
-            <input type="text" name="termoPesquisa" value="@Model.TermoPesquisa" class="fc-input" placeholder="Pesquisar por nome ou nome científico..." />
-            <button type="submit" class="btn-coral" style="width: auto; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;">
-                <i class="bi bi-search"></i>
-            </button>
-        </div>
-    </form>
+    <form asp-action="Index" method="get" class="search-form-peixe"><div class="search-box-peixe"><input type="text" name="termoPesquisa" value="@Model.TermoPesquisa" class="search-input-peixe" placeholder="Pesquisar por nome ou nome científico..." /><button type="submit" class="search-btn-peixe"><i class="bi bi-search"></i></button></div></form>
 
     @if (Model.Peixes.Any())
     {
