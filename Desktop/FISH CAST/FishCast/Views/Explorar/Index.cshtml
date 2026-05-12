@@ -1,0 +1,118 @@
+@model FishCast.ViewModels.ExplorarViewModel
+
+@{
+    ViewData["Title"] = "Explorar - FishCast";
+}
+
+<div class="profile-page">
+    <div class="catalog-header">
+        <h2><i class="bi bi-compass"></i> Explorar Capturas</h2>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-bar">
+        <form asp-action="Index" method="get" class="d-flex flex-wrap gap-3 align-items-center">
+            <div class="filter-group">
+                <label><i class="bi bi-sort-down"></i> Ordenar:</label>
+                <select name="ordenacao" class="filter-select" onchange="this.form.submit()">
+                    @foreach (var opcao in Model.OpcoesOrdenacao)
+                    {
+                        if (Model.Ordenacao == opcao.Value)
+                        {
+                            <option value="@opcao.Value" selected>@opcao.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@opcao.Value">@opcao.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="bi bi-geo-alt"></i> Praia:</label>
+                <select name="filtroPraia" class="filter-select" onchange="this.form.submit()">
+                    @foreach (var praia in Model.Praias)
+                    {
+                        if (Model.FiltroPraia == praia.Value)
+                        {
+                            <option value="@praia.Value" selected>@praia.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@praia.Value">@praia.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="bi bi-water"></i> Espécie:</label>
+                <select name="filtroEspecie" class="filter-select" onchange="this.form.submit()">
+                    @foreach (var especie in Model.Especies)
+                    {
+                        if (Model.FiltroEspecie == especie.Value)
+                        {
+                            <option value="@especie.Value" selected>@especie.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@especie.Value">@especie.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="bi bi-fishing"></i> Tipo:</label>
+                <select name="filtroTipoPesca" class="filter-select" onchange="this.form.submit()">
+                    @foreach (var tipo in Model.TiposPesca)
+                    {
+                        if (Model.FiltroTipoPesca == tipo.Value)
+                        {
+                            <option value="@tipo.Value" selected>@tipo.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@tipo.Value">@tipo.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.FiltroPraia) || !string.IsNullOrEmpty(Model.FiltroEspecie) || !string.IsNullOrEmpty(Model.FiltroTipoPesca))
+            {
+                <a asp-action="Index" asp-route-ordenacao="@Model.Ordenacao" class="btn-outline-fc" style="width: auto; padding: 6px 14px;">
+                    <i class="bi bi-x-circle"></i> Limpar
+                </a>
+            }
+        </form>
+    </div>
+
+    <!-- RESULTS -->
+    @if (Model.Capturas.Any())
+    {
+        <div class="capture-grid">
+            @foreach (var item in Model.Capturas)
+            {
+                <a asp-controller="Captura" asp-action="Details" asp-route-id="@item.Captura.Id" class="grid-item text-decoration-none">
+                    <img src="@item.Captura.ImagemPath" alt="@item.Captura.Titulo" onerror="this.src='/images/default-captura.svg'">
+                    <div class="grid-item-overlay">
+                        <i class="bi bi-heart-fill"></i>
+                        <span>@item.LikesCount</span>
+                        <i class="bi bi-chat-fill"></i>
+                        <span>@item.CommentsCount</span>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <h3>Nenhuma captura encontrada</h3>
+            <p>Tente ajustar os filtros para ver mais resultados.</p>
+        </div>
+    }
+</div>

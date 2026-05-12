@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FishCast — Rede Social de Pesca</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep: #060e1a;
+  --ocean-mid: #0d1f3c;
+  --ocean-light: #1e3a5f;
+  --steel: #2a4a72;
+  --coral: #e8634a;
+  --coral-light: #f0856f;
+  --sandy: #f4a261;
+  --foam: #e8e6e0;
+  --foam-muted: #9ba8b5;
+  --surface: rgba(30,58,95,0.4);
+  --surface-solid: #132238;
+  --card-bg: #0d1f3c;
+  --card-border: rgba(255,255,255,0.07);
+  --input-bg: rgba(6,14,26,0.6);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  --shadow-sm: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--ocean-deep);
+  color: var(--foam);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* BACKGROUND TEXTURE */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(30,58,95,0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(232,99,74,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* TYPOGRAPHY */
+.brand-font { font-family: 'Playfair Display', serif; }
+
+/* ===================== NAVBAR ===================== */
+.navbar-fishcast {
+  background: rgba(6,14,26,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--card-border);
+  padding: 0 1.25rem;
+  height: 60px;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.navbar-brand-fc {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--foam);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.navbar-brand-fc .hook {
+  width: 32px; height: 32px;
+  background: var(--coral);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+
+.nav-search {
+  flex: 1; max-width: 320px;
+  position: relative;
+}
+.nav-search input {
+  background: var(--surface);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  color: var(--foam);
+  padding: 7px 14px 7px 36px;
+  width: 100%;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+}
+.nav-search input::placeholder { color: var(--foam-muted); }
+.nav-search input:focus { outline: none; border-color: var(--coral); background: rgba(6,14,26,0.8); }
+.nav-search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--foam-muted); font-size: 14px; }
+
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+
+.nav-btn {
+  background: none; border: none;
+  color: var(--foam-muted);
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 18px;
+  transition: all .2s;
+  text-decoration: none;
+}
+.nav-btn:hover { background: var(--surface); color: var(--foam); }
+.nav-btn.active { color: var(--coral); }
+
+.btn-post-nav {
+  background: var(--coral);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  transition: all .2s;
+  text-decoration: none;
+}
+.btn-post-nav:hover { background: var(--coral-light); color: #fff; transform: translateY(-1px); }
+
+.avatar-sm {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--coral);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.avatar-md {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--steel);
+  flex-shrink: 0;
+}
+.avatar-lg {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--coral);
+}
+
+/* ===================== MAIN LAYOUT ===================== */
+.app-layout {
+  padding-top: 60px;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===================== PAGES ===================== */
+.page { display: none; animation: fadeUp .3s ease; }
+.page.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================== AUTH PAGES ===================== */
+.auth-container {
+  min-height: calc(100vh - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.auth-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow);
+}
+
+.auth-hero {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.auth-hero .hook-big {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, var(--coral), var(--sandy));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 1rem;
+  box-shadow: 0 4px 20px rgba(232,99,74,0.3);
+}
+.auth-hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--foam);
+}
+.auth-hero p { color: var(--foam-muted); font-size: 14px; margin-top: 4px; }
+
+/* FORM CONTROLS */
+.fc-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--foam-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.fc-input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  color: var(--foam);
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color .2s;
+}
+.fc-input:focus { outline: none; border-color: var(--coral); background: rgba(6,14,26,0.8); }
+.fc-input::placeholder { color: var(--foam-muted); }
+.fc-input option { background: var(--ocean-mid); color: var(--foam); }
+
+.fc-select {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  color: var(--foam);
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color .2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239ba8b5' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+.fc-select:focus { outline: none; border-color: var(--coral); }
+.fc-select option { background: var(--ocean-mid); }
+
+.fc-textarea {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  color: var(--foam);
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  resize: vertical;
+  min-height: 80px;
+}
+.fc-textarea:focus { outline: none; border-color: var(--coral); }
+
+.btn-coral {
+  background: var(--coral);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all .2s;
+  width: 100%;
+}
+.btn-coral:hover { background: var(--coral-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(232,99,74,0.35); }
+.btn-coral:active { transform: translateY(0); }
+
+.btn-outline-fc {
+  background: transparent;
+  color: var(--foam-muted);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all .2s;
+  width: 100%;
+}
+.btn-outline-fc:hover { border-color: var(--foam-muted); color: var(--foam); background: var(--surface); }
+
+.auth-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 1.25rem 0;
+  color: var(--foam-muted); font-size: 12px;
+}
+.auth-divider::before, .auth-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--card-border);
+}
+
+.auth-link {
+  text-align: center; font-size: 13px; color: var(--foam-muted);
+  margin-top: 1.25rem;
+}
+.auth-link a { color: var(--coral); text-decoration: none; font-weight: 600; }
+.auth-link a:hover { color: var(--coral-light); }
+
+/* ===================== FEED ===================== */
+.feed-layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .feed-layout { grid-template-columns: 1fr; }
+  .feed-sidebar { display: none; }
+}
+
+/* STORIES BAR */
+.stories-bar {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.stories-bar::-webkit-scrollbar { display: none; }
+
+.story-item {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  cursor: pointer; flex-shrink: 0;
+}
+.story-ring {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--coral), var(--sandy));
+  padding: 2px;
+  display: flex; align-items: center; justify-content: center;
+}
+.story-ring img {
+  width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--ocean-mid);
+}
+.story-ring.add-story {
+  background: var(--surface);
+  border: 2px dashed var(--card-border);
+}
+.story-ring.add-story .add-icon {
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--foam-muted); font-size: 20px;
+}
+.story-name { font-size: 11px; color: var(--foam-muted); text-align: center; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* CAPTURE CARD */
+.capture-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+}
+.capture-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+
+.card-header-fc {
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.card-user-info { flex: 1; }
+.card-user-name { font-size: 14px; font-weight: 600; color: var(--foam); line-height: 1.2; }
+.card-meta { font-size: 12px; color: var(--foam-muted); display: flex; align-items: center; gap: 6px; }
+
+.card-image-wrap {
+  position: relative; overflow: hidden;
+  aspect-ratio: 4/3;
+  background: var(--ocean-mid);
+}
+.card-image-wrap img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .4s;
+}
+.capture-card:hover .card-image-wrap img { transform: scale(1.03); }
+
+.card-fish-badge {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(6,14,26,0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px; font-weight: 600; color: var(--sandy);
+  display: flex; align-items: center; gap: 5px;
+}
+
+.card-stats-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(6,14,26,0.9));
+  padding: 24px 14px 14px;
+  display: flex; gap: 10px;
+}
+.stat-pill {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 11px; color: var(--foam);
+  display: flex; align-items: center; gap: 4px;
+}
+.stat-pill i { font-size: 11px; color: var(--coral); }
+
+.card-body-fc { padding: 14px 16px; }
+.card-location {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--foam-muted);
+  margin-bottom: 8px;
+}
+.card-obs { font-size: 13px; color: var(--foam); line-height: 1.5; margin-bottom: 12px; }
+
+.card-actions {
+  display: flex; align-items: center; gap: 0;
+  border-top: 1px solid var(--card-border);
+  padding-top: 10px;
+}
+.action-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px;
+  border: none; background: none;
+  color: var(--foam-muted); font-size: 13px; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; border-radius: var(--radius-sm);
+  transition: all .2s;
+}
+.action-btn:hover { background: var(--surface); color: var(--foam); }
+.action-btn.liked { color: var(--coral); }
+.action-btn i { font-size: 16px; }
+
+.comment-section { padding: 0 16px 14px; }
+.comment-item {
+  display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-start;
+}
+.comment-bubble {
+  background: var(--surface);
+  border-radius: 12px; padding: 8px 12px; flex: 1;
+}
+.comment-author { font-size: 12px; font-weight: 600; color: var(--foam); margin-bottom: 2px; }
+.comment-text { font-size: 13px; color: var(--foam-muted); line-height: 1.4; }
+.comment-input-wrap {
+  display: flex; gap: 8px; align-items: center; margin-top: 10px;
+}
+.comment-input {
+  flex: 1; background: var(--surface);
+  border: 1px solid var(--card-border); border-radius: 20px;
+  padding: 8px 14px; color: var(--foam); font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+}
+.comment-input:focus { outline: none; border-color: var(--coral); }
+.comment-send {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--coral); border: none;
+  color: #fff; cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s; flex-shrink: 0;
+}
+.comment-send:hover { background: var(--coral-light); transform: scale(1.05); }
+
+/* ===================== SIDEBAR ===================== */
+.feed-sidebar { position: sticky; top: 76px; }
+
+.sidebar-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.sidebar-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--foam-muted);
+  margin-bottom: 1rem;
+}
+
+.my-profile-preview {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;
+}
+.profile-info-name { font-size: 14px; font-weight: 600; color: var(--foam); }
+.profile-info-sub { font-size: 12px; color: var(--foam-muted); }
+
+.profile-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px; background: var(--card-border);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm); overflow: hidden;
+}
+.profile-stat-item {
+  background: var(--surface);
+  padding: 10px 8px; text-align: center;
+}
+.profile-stat-n { font-size: 18px; font-weight: 700; color: var(--foam); line-height: 1; }
+.profile-stat-l { font-size: 10px; color: var(--foam-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+.suggestion-item {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.suggestion-info { flex: 1; }
+.suggestion-name { font-size: 13px; font-weight: 600; color: var(--foam); }
+.suggestion-sub { font-size: 11px; color: var(--foam-muted); }
+.btn-follow {
+  background: transparent; border: 1px solid var(--coral);
+  color: var(--coral); border-radius: 16px;
+  padding: 4px 14px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+  font-family: 'DM Sans', sans-serif; flex-shrink: 0;
+}
+.btn-follow:hover { background: var(--coral); color: #fff; }
+.btn-follow.following { background: var(--surface); border-color: var(--card-border); color: var(--foam-muted); }
+
+.top-fish-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid var(--card-border);
+}
+.top-fish-item:last-child { border-bottom: none; }
+.fish-rank { width: 20px; font-size: 12px; font-weight: 700; color: var(--coral); }
+.fish-name { font-size: 13px; color: var(--foam); font-weight: 500; }
+.fish-count { font-size: 12px; color: var(--foam-muted); }
+
+/* ===================== CREATE CAPTURE PAGE ===================== */
+.create-page {
+  max-width: 680px; margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.create-header {
+  margin-bottom: 1.5rem;
+}
+.create-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem; font-weight: 900; color: var(--foam);
+}
+.create-header p { color: var(--foam-muted); font-size: 14px; margin-top: 4px; }
+
+.create-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.create-steps {
+  display: flex; border-bottom: 1px solid var(--card-border);
+}
+.create-step {
+  flex: 1; padding: 14px; text-align: center;
+  font-size: 12px; font-weight: 600; color: var(--foam-muted);
+  border-bottom: 2px solid transparent; cursor: pointer;
+  transition: all .2s;
+}
+.create-step.active { color: var(--coral); border-bottom-color: var(--coral); }
+.create-step.done { color: var(--foam-muted); }
+.create-step .step-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--card-border);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; margin-bottom: 4px;
+}
+.create-step.active .step-num { background: var(--coral); border-color: var(--coral); color: #fff; }
+.create-step.done .step-num { background: rgba(46,204,113,0.2); border-color: rgba(46,204,113,0.4); color: #2ecc71; }
+
+.step-content { display: none; padding: 1.5rem; }
+.step-content.active { display: block; }
+
+/* PHOTO UPLOAD */
+.photo-drop {
+  border: 2px dashed var(--card-border);
+  border-radius: var(--radius);
+  padding: 2.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  position: relative;
+}
+.photo-drop:hover { border-color: var(--coral); background: rgba(232,99,74,0.04); }
+.photo-drop input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+.photo-drop-icon { font-size: 2.5rem; color: var(--foam-muted); margin-bottom: .75rem; }
+.photo-drop h4 { font-size: 15px; color: var(--foam); margin-bottom: 6px; }
+.photo-drop p { font-size: 12px; color: var(--foam-muted); }
+
+.photo-preview {
+  position: relative; border-radius: var(--radius);
+  overflow: hidden; aspect-ratio: 4/3;
+  display: none;
+}
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-preview-remove {
+  position: absolute; top: 10px; right: 10px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(6,14,26,0.85); border: none;
+  color: var(--foam); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
+
+.form-group { margin-bottom: 1rem; }
+
+.tide-btns { display: flex; gap: 8px; }
+.tide-btn {
+  flex: 1; padding: 10px; border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm); background: var(--input-bg);
+  color: var(--foam-muted); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all .2s; text-align: center;
+  font-family: 'DM Sans', sans-serif;
+}
+.tide-btn:hover { border-color: var(--foam-muted); color: var(--foam); }
+.tide-btn.selected { border-color: var(--coral); background: rgba(232,99,74,0.12); color: var(--coral); }
+
+.form-nav { display: flex; gap: 10px; padding: 0 1.5rem 1.5rem; }
+
+/* ===================== PROFILE PAGE ===================== */
+.profile-page {
+  max-width: 900px; margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.profile-hero {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+.profile-hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 100px;
+  background: linear-gradient(135deg, var(--ocean-light), var(--steel));
+  opacity: 0.4;
+}
+.profile-hero-content {
+  position: relative;
+  display: flex; align-items: flex-end; gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.profile-info { flex: 1; }
+.profile-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-weight: 900; color: var(--foam); margin-bottom: 4px;
+}
+.profile-handle { font-size: 13px; color: var(--foam-muted); margin-bottom: 10px; }
+.profile-bio { font-size: 13px; color: var(--foam); line-height: 1.5; margin-bottom: 12px; }
+
+.profile-stats-row {
+  display: flex; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap;
+}
+.prof-stat { text-align: center; }
+.prof-stat-n { font-size: 1.3rem; font-weight: 700; color: var(--foam); }
+.prof-stat-l { font-size: 12px; color: var(--foam-muted); }
+
+.profile-actions { display: flex; gap: 10px; }
+.btn-edit-profile {
+  background: var(--surface); border: 1px solid var(--card-border);
+  color: var(--foam); border-radius: var(--radius-sm);
+  padding: 8px 20px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all .2s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-edit-profile:hover { background: var(--steel); color: var(--foam); }
+
+.profile-tabs {
+  display: flex; border-bottom: 1px solid var(--card-border);
+  margin-bottom: 1.25rem; background: var(--card-bg);
+  border: 1px solid var(--card-border); border-radius: var(--radius);
+  overflow: hidden;
+}
+.profile-tab {
+  flex: 1; padding: 12px; text-align: center;
+  font-size: 13px; font-weight: 600; color: var(--foam-muted);
+  border-bottom: 2px solid transparent; cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.profile-tab.active { color: var(--coral); border-bottom-color: var(--coral); }
+.profile-tab:hover { color: var(--foam); }
+
+.capture-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius); overflow: hidden;
+}
+@media (max-width: 480px) { .capture-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.grid-item {
+  aspect-ratio: 1; background: var(--ocean-mid);
+  overflow: hidden; position: relative; cursor: pointer;
+}
+.grid-item img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.grid-item:hover img { transform: scale(1.08); }
+.grid-item-overlay {
+  position: absolute; inset: 0;
+  background: rgba(6,14,26,0.7);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+  opacity: 0; transition: opacity .2s;
+  color: #fff; font-size: 13px; font-weight: 600;
+}
+.grid-item:hover .grid-item-overlay { opacity: 1; }
+
+/* ===================== FISH CATALOG ===================== */
+.catalog-page {
+  max-width: 900px; margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.catalog-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;
+}
+.catalog-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-weight: 900;
+}
+
+.catalog-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-chip {
+  padding: 6px 14px; border-radius: 20px;
+  border: 1px solid var(--card-border);
+  background: var(--input-bg); color: var(--foam-muted);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: all .2s; font-family: 'DM Sans', sans-serif;
+}
+.filter-chip:hover { border-color: var(--foam-muted); color: var(--foam); }
+.filter-chip.active { border-color: var(--coral); background: rgba(232,99,74,0.12); color: var(--coral); }
+
+.fish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+
+.fish-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  overflow: hidden; cursor: pointer;
+  transition: all .2s;
+}
+.fish-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--steel); }
+.fish-card-img {
+  height: 130px; background: var(--ocean-mid);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.5rem;
+}
+.fish-card-body { padding: 12px; }
+.fish-card-name { font-size: 14px; font-weight: 700; color: var(--foam); margin-bottom: 2px; }
+.fish-card-species { font-size: 11px; color: var(--foam-muted); font-style: italic; margin-bottom: 8px; }
+.fish-card-tag {
+  display: inline-block; padding: 2px 8px;
+  border-radius: 10px; font-size: 10px; font-weight: 600;
+  text-transform: uppercase;
+}
+.tag-fundo { background: rgba(30,58,95,0.6); color: #85b7eb; }
+.tag-superficie { background: rgba(244,162,97,0.15); color: var(--sandy); }
+.tag-costeiro { background: rgba(46,204,113,0.12); color: #2ecc71; }
+
+/* ===================== NOTIFICATION TOAST ===================== */
+.toast-fc {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-left: 3px solid var(--coral);
+  border-radius: var(--radius-sm); padding: 12px 16px;
+  box-shadow: var(--shadow); z-index: 9999;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--foam);
+  transform: translateX(120%); transition: transform .3s;
+  max-width: 300px;
+}
+.toast-fc.show { transform: translateX(0); }
+.toast-fc i { color: var(--coral); font-size: 16px; flex-shrink: 0; }
+
+/* ===================== MODAL ===================== */
+.modal-fc { display: none; position: fixed; inset: 0; z-index: 2000; }
+.modal-fc.show { display: flex; align-items: center; justify-content: center; }
+.modal-backdrop-fc {
+  position: absolute; inset: 0;
+  background: rgba(6,14,26,0.85); backdrop-filter: blur(4px);
+}
+.modal-content-fc {
+  position: relative; z-index: 1;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: var(--radius); width: 100%; max-width: 560px;
+  max-height: 90vh; overflow-y: auto;
+  margin: 1rem;
+  box-shadow: var(--shadow);
+}
+.modal-header-fc {
+  padding: 1.25rem 1.25rem .75rem;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--card-border);
+}
+.modal-title-fc { font-size: 16px; font-weight: 700; color: var(--foam); }
+.modal-close-fc {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--surface); border: none;
+  color: var(--foam-muted); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-body-fc { padding: 1.25rem; }
+.modal-footer-fc {
+  padding: .75rem 1.25rem;
+  border-top: 1px solid var(--card-border);
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+
+/* ===================== EMPTY STATE ===================== */
+.empty-state { text-align: center; padding: 3rem 1rem; }
+.empty-state-icon { font-size: 3.5rem; color: var(--foam-muted); margin-bottom: 1rem; opacity: 0.5; }
+.empty-state h3 { font-size: 1rem; color: var(--foam-muted); margin-bottom: 8px; }
+.empty-state p { font-size: 13px; color: var(--foam-muted); opacity: 0.7; }
+
+/* ===================== TIDE INDICATOR ===================== */
+.tide-indicator {
+  display: flex; align-items: center; gap: 4px; font-size: 11px;
+}
+.tide-icon { font-size: 12px; }
+.tide-preia .tide-icon { color: #4fc3f7; }
+.tide-baixa .tide-icon { color: var(--sandy); }
+.tide-meia .tide-icon { color: #80deea; }
+
+/* ===================== LOADING ===================== */
+.skeleton {
+  background: linear-gradient(90deg, var(--card-bg) 25%, var(--surface) 50%, var(--card-bg) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ===================== SCROLLBAR ===================== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--steel); }
+
+/* ===================== BADGE ===================== */
+.badge-coral { background: var(--coral); color: #fff; font-size: 10px; border-radius: 8px; padding: 2px 6px; font-weight: 700; }
+
+/* UTIL */
+.text-coral { color: var(--coral); }
+.text-sandy { color: var(--sandy); }
+.text-muted-fc { color: var(--foam-muted); }
+.gap-6 { gap: 6px; }
+.mb-fc { margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar-fishcast" id="mainNav">
+  <a class="navbar-brand-fc" href="#" onclick="showPage('feed')">
+    <div class="hook">🎣</div>
+    <span class="brand-font">FishCast</span>
+  </a>
+
+  <div class="nav-search d-none d-md-block">
+    <i class="bi bi-search"></i>
+    <input type="text" placeholder="Pesquisar capturas, pescadores...">
+  </div>
+
+  <div class="nav-actions" id="navAuth">
+    <!-- LOGGED IN STATE (default) -->
+    <div id="navLoggedIn" style="display:flex;align-items:center;gap:8px">
+      <button class="nav-btn" onclick="showPage('feed')" title="Feed"><i class="bi bi-house-fill"></i></button>
+      <button class="nav-btn" onclick="showPage('catalog')" title="Peixes"><i class="bi bi-water"></i></button>
+      <button class="nav-btn" title="Notificações" style="position:relative">
+        <i class="bi bi-bell"></i>
+        <span class="badge-coral" style="position:absolute;top:4px;right:4px">3</span>
+      </button>
+      <a class="btn-post-nav" href="#" onclick="showPage('create'); return false">
+        <i class="bi bi-plus-lg"></i> Nova Captura
+      </a>
+      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas&backgroundColor=1e3a5f" class="avatar-sm" onclick="showPage('profile')" alt="Perfil">
+    </div>
+    <!-- LOGGED OUT STATE -->
+    <div id="navLoggedOut" style="display:none;gap:8px;align-items:center">
+      <button class="btn-outline-fc" style="width:auto;padding:7px 16px" onclick="showPage('login')">Entrar</button>
+      <button class="btn-coral" style="width:auto;padding:7px 16px" onclick="showPage('register')">Registar</button>
+    </div>
+  </div>
+</nav>
+
+<div class="app-layout">
+
+<!-- ===================== LOGIN PAGE ===================== -->
+<div id="page-login" class="page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-hero">
+        <div class="hook-big">🎣</div>
+        <h1 class="brand-font">FishCast</h1>
+        <p>A rede social dos pescadores de Viana do Castelo</p>
+      </div>
+
+      <form onsubmit="doLogin(event)">
+        <div class="form-group">
+          <label class="fc-label">Email</label>
+          <input type="email" class="fc-input" placeholder="pescador@email.com" id="loginEmail" required>
+        </div>
+        <div class="form-group mb-fc">
+          <label class="fc-label">Password</label>
+          <input type="password" class="fc-input" placeholder="••••••••" id="loginPassword" required>
+        </div>
+        <button type="submit" class="btn-coral">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+        </button>
+      </form>
+
+      <div class="auth-divider">ou</div>
+
+      <button class="btn-outline-fc" onclick="demoLogin()">
+        <i class="bi bi-person-check me-2"></i>Entrar como convidado
+      </button>
+
+      <div class="auth-link">
+        Não tens conta? <a href="#" onclick="showPage('register')">Registar agora</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== REGISTER PAGE ===================== -->
+<div id="page-register" class="page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-hero">
+        <div class="hook-big">🐟</div>
+        <h1 class="brand-font">Criar Conta</h1>
+        <p>Junta-te à comunidade de pescadores do Cabedelo</p>
+      </div>
+
+      <form onsubmit="doRegister(event)">
+        <div class="form-group">
+          <label class="fc-label">Nome de pescador</label>
+          <input type="text" class="fc-input" placeholder="O teu nome" id="regNome" required>
+        </div>
+        <div class="form-group">
+          <label class="fc-label">Email</label>
+          <input type="email" class="fc-input" placeholder="email@exemplo.com" id="regEmail" required>
+        </div>
+        <div class="form-group">
+          <label class="fc-label">Password</label>
+          <input type="password" class="fc-input" placeholder="Mínimo 6 caracteres" id="regPassword" required minlength="6">
+        </div>
+        <div class="form-group mb-fc">
+          <label class="fc-label">Confirmar Password</label>
+          <input type="password" class="fc-input" placeholder="Repetir password" id="regConfirm" required>
+        </div>
+        <button type="submit" class="btn-coral">
+          <i class="bi bi-person-plus me-2"></i>Criar Conta
+        </button>
+      </form>
+
+      <div class="auth-link">
+        Já tens conta? <a href="#" onclick="showPage('login')">Entrar</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FEED PAGE ===================== -->
+<div id="page-feed" class="page active">
+  <div class="feed-layout">
+    <!-- MAIN FEED -->
+    <div>
+      <!-- STORIES -->
+      <div class="stories-bar" id="storiesBar"></div>
+
+      <!-- CARDS -->
+      <div id="feedCards"></div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="feed-sidebar">
+      <!-- MY PROFILE -->
+      <div class="sidebar-card">
+        <div class="my-profile-preview">
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas&backgroundColor=1e3a5f" class="avatar-md" alt="">
+          <div>
+            <div class="profile-info-name">Lucas Gonçalves</div>
+            <div class="profile-info-sub">@lucas_pesca · Cabedelo</div>
+          </div>
+        </div>
+        <div class="profile-stats">
+          <div class="profile-stat-item">
+            <div class="profile-stat-n">24</div>
+            <div class="profile-stat-l">Capturas</div>
+          </div>
+          <div class="profile-stat-item">
+            <div class="profile-stat-n">138</div>
+            <div class="profile-stat-l">Seguidores</div>
+          </div>
+          <div class="profile-stat-item">
+            <div class="profile-stat-n">67</div>
+            <div class="profile-stat-l">A seguir</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUGESTÕES -->
+      <div class="sidebar-card">
+        <div class="sidebar-title">Pescadores a seguir</div>
+        <div id="suggestionsContainer"></div>
+      </div>
+
+      <!-- TOP PEIXES -->
+      <div class="sidebar-card">
+        <div class="sidebar-title">🏆 Mais capturados esta semana</div>
+        <div id="topFishContainer"></div>
+      </div>
+
+      <div style="font-size:11px;color:var(--foam-muted);line-height:1.6;padding:0 4px">
+        FishCast © 2026 · Lucas Gonçalves<br>
+        IEFP Braga · ASP.NET Core MVC<br>
+        Cabedelo, Viana do Castelo 🌊
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== CREATE CAPTURE PAGE ===================== -->
+<div id="page-create" class="page">
+  <div class="create-page">
+    <div class="create-header">
+      <h2 class="brand-font">Nova Captura</h2>
+      <p>Partilha a tua pesca com a comunidade do Cabedelo</p>
+    </div>
+
+    <div class="create-card">
+      <!-- STEP INDICATORS -->
+      <div class="create-steps">
+        <div class="create-step active" id="step-tab-1" onclick="goStep(1)">
+          <div class="step-num" id="step-num-1">1</div>
+          <div>Foto</div>
+        </div>
+        <div class="create-step" id="step-tab-2" onclick="goStep(2)">
+          <div class="step-num" id="step-num-2">2</div>
+          <div>Peixe & Local</div>
+        </div>
+        <div class="create-step" id="step-tab-3" onclick="goStep(3)">
+          <div class="step-num" id="step-num-3">3</div>
+          <div>Detalhes</div>
+        </div>
+      </div>
+
+      <!-- STEP 1: PHOTO -->
+      <div class="step-content active" id="step-1">
+        <div class="photo-drop" id="photoDrop" onclick="triggerFileInput()">
+          <input type="file" id="photoInput" accept="image/*" onchange="handlePhoto(event)">
+          <div class="photo-drop-icon"><i class="bi bi-camera"></i></div>
+          <h4>Adiciona uma foto da tua captura</h4>
+          <p>Clica aqui ou arrasta uma imagem<br><span style="color:var(--coral)">JPG, PNG até 10MB</span></p>
+        </div>
+        <div class="photo-preview" id="photoPreview">
+          <img id="photoPreviewImg" src="" alt="Preview">
+          <button class="photo-preview-remove" onclick="removePhoto()"><i class="bi bi-x"></i></button>
+        </div>
+
+        <div class="form-group" style="margin-top:1rem">
+          <label class="fc-label">Observação / Legenda</label>
+          <textarea class="fc-textarea" id="obsInput" placeholder="Conta-nos sobre esta captura... condições do mar, isca usada, tempo que demorou..."></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 2: FISH & LOCATION -->
+      <div class="step-content" id="step-2">
+        <div class="form-group">
+          <label class="fc-label"><i class="bi bi-water me-1 text-coral"></i>Espécie de peixe</label>
+          <select class="fc-select" id="peixeSelect">
+            <option value="">-- Seleciona o peixe --</option>
+            <option value="1">🐟 Robalo — Dicentrarchus labrax</option>
+            <option value="2">🐠 Carapau — Trachurus trachurus</option>
+            <option value="3">🐡 Linguado — Solea solea</option>
+            <option value="4">🦑 Polvo — Octopus vulgaris</option>
+            <option value="5">🐟 Dourada — Sparus aurata</option>
+            <option value="6">🐠 Sargo — Diplodus sargus</option>
+            <option value="7">🐡 Garoupa — Epinephelus marginatus</option>
+            <option value="8">🦐 Sapateira — Cancer pagurus</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="fc-label"><i class="bi bi-geo-alt me-1 text-coral"></i>Local de pesca</label>
+          <input type="text" class="fc-input" id="localInput" placeholder="Ex: Cabedelo, Farol, Molhe Norte..." list="locaisData">
+          <datalist id="locaisData">
+            <option value="Cabedelo — Viana do Castelo">
+            <option value="Farol de Viana">
+            <option value="Molhe Norte — Viana">
+            <option value="Praia do Cabedelo">
+            <option value="Rio Lima — Viana">
+            <option value="Praia da Amorosa">
+            <option value="Forte do Cão">
+          </datalist>
+        </div>
+        <div class="form-group">
+          <label class="fc-label"><i class="bi bi-tools me-1 text-coral"></i>Tipo de pesca</label>
+          <select class="fc-select" id="tipoPescaSelect">
+            <option value="">-- Tipo de pesca --</option>
+            <option value="Fundo">🪨 Pesca de Fundo</option>
+            <option value="Superficie">🌊 Pesca de Superfície</option>
+            <option value="Fly">🪶 Fly Fishing</option>
+            <option value="Spinning">🌀 Spinning</option>
+            <option value="Cana">🎣 Cana de Praia</option>
+            <option value="Mergulho">🤿 Pesca em Mergulho</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="fc-label"><i class="bi bi-arrow-down-up me-1 text-coral"></i>Estado da Maré</label>
+          <div class="tide-btns">
+            <button type="button" class="tide-btn" id="mare-preia" onclick="selectMare('Preia-mar')">
+              🔼 Preia-mar
+            </button>
+            <button type="button" class="tide-btn" id="mare-baixa" onclick="selectMare('Baixa-mar')">
+              🔽 Baixa-mar
+            </button>
+            <button type="button" class="tide-btn" id="mare-meia" onclick="selectMare('Meia-maré')">
+              〰️ Meia-maré
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: DETAILS -->
+      <div class="step-content" id="step-3">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="fc-label"><i class="bi bi-hash me-1 text-coral"></i>Quantidade</label>
+            <input type="number" class="fc-input" id="qtdInput" placeholder="Ex: 3" min="1" max="999">
+          </div>
+          <div class="form-group">
+            <label class="fc-label"><i class="bi bi-speedometer2 me-1 text-coral"></i>Peso total (kg)</label>
+            <input type="number" class="fc-input" id="pesoInput" placeholder="Ex: 1.85" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="fc-label"><i class="bi bi-calendar3 me-1 text-coral"></i>Data e hora da captura</label>
+          <input type="datetime-local" class="fc-input" id="dataInput">
+        </div>
+
+        <!-- PREVIEW FINAL -->
+        <div style="margin-top:1.5rem;padding:1rem;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--card-border)">
+          <div class="sidebar-title" style="margin-bottom:.75rem">📋 Resumo da captura</div>
+          <div id="previewSummary" style="font-size:13px;color:var(--foam-muted);line-height:1.8"></div>
+        </div>
+      </div>
+
+      <!-- NAV BUTTONS -->
+      <div class="form-nav">
+        <button class="btn-outline-fc" style="flex:1;padding:11px" id="btnBack" onclick="prevStep()" style="display:none">
+          <i class="bi bi-arrow-left me-2"></i>Anterior
+        </button>
+        <button class="btn-coral" style="flex:2;padding:11px" id="btnNext" onclick="nextStep()">
+          Próximo <i class="bi bi-arrow-right ms-2"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PROFILE PAGE ===================== -->
+<div id="page-profile" class="page">
+  <div class="profile-page">
+    <div class="profile-hero">
+      <div class="profile-hero-content">
+        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas&backgroundColor=1e3a5f" class="avatar-lg" alt="Avatar" style="margin-top:50px">
+        <div class="profile-info">
+          <div class="profile-name brand-font" style="margin-top:50px">Lucas Gonçalves</div>
+          <div class="profile-handle">@lucas_pesca · Cabedelo, Viana do Castelo 📍</div>
+          <div class="profile-bio">Pescador de fundo, apaixonado pela costa do Cabedelo. Robalos e linguados são os meus favoritos. 🎣🌊</div>
+          <div class="profile-stats-row">
+            <div class="prof-stat"><div class="prof-stat-n">24</div><div class="prof-stat-l">Capturas</div></div>
+            <div class="prof-stat"><div class="prof-stat-n">138</div><div class="prof-stat-l">Seguidores</div></div>
+            <div class="prof-stat"><div class="prof-stat-n">67</div><div class="prof-stat-l">A seguir</div></div>
+            <div class="prof-stat"><div class="prof-stat-n">12.4kg</div><div class="prof-stat-l">Total capturado</div></div>
+          </div>
+          <div class="profile-actions">
+            <a class="btn-edit-profile" href="#" onclick="openModal('editProfile')">
+              <i class="bi bi-pencil"></i> Editar perfil
+            </a>
+            <a class="btn-edit-profile" href="#" onclick="showPage('create')">
+              <i class="bi bi-plus-lg"></i> Nova captura
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-tabs">
+      <div class="profile-tab active" id="ptab-grid" onclick="switchProfileTab('grid')">
+        <i class="bi bi-grid-3x3"></i> Capturas
+      </div>
+      <div class="profile-tab" id="ptab-stats" onclick="switchProfileTab('stats')">
+        <i class="bi bi-bar-chart"></i> Estatísticas
+      </div>
+      <div class="profile-tab" id="ptab-saved" onclick="switchProfileTab('saved')">
+        <i class="bi bi-bookmark"></i> Guardados
+      </div>
+    </div>
+
+    <!-- GRID TAB -->
+    <div id="ptab-content-grid" class="capture-grid"></div>
+
+    <!-- STATS TAB -->
+    <div id="ptab-content-stats" style="display:none">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1rem">
+        <div class="sidebar-card" style="text-align:center">
+          <div style="font-size:2rem;font-weight:700;color:var(--coral)">🐟</div>
+          <div style="font-size:1.2rem;font-weight:700;color:var(--foam)">Robalo</div>
+          <div style="font-size:12px;color:var(--foam-muted)">Peixe mais capturado</div>
+        </div>
+        <div class="sidebar-card" style="text-align:center">
+          <div style="font-size:2rem;font-weight:700;color:var(--sandy)">📍</div>
+          <div style="font-size:1.2rem;font-weight:700;color:var(--foam)">Cabedelo</div>
+          <div style="font-size:12px;color:var(--foam-muted)">Local favorito</div>
+        </div>
+        <div class="sidebar-card" style="text-align:center">
+          <div style="font-size:2rem;font-weight:700;color:var(--coral)">⏰</div>
+          <div style="font-size:1.2rem;font-weight:700;color:var(--foam)">07:00–10:00</div>
+          <div style="font-size:12px;color:var(--foam-muted)">Melhor horário</div>
+        </div>
+        <div class="sidebar-card" style="text-align:center">
+          <div style="font-size:2rem;font-weight:700;color:var(--sandy)">🔽</div>
+          <div style="font-size:1.2rem;font-weight:700;color:var(--foam)">Baixa-mar</div>
+          <div style="font-size:12px;color:var(--foam-muted)">Maré mais produtiva</div>
+        </div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-title">Capturas por tipo de pesca</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:.5rem">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>🪨 Pesca de Fundo</span><span style="color:var(--coral)">58%</span></div>
+            <div style="height:6px;background:var(--surface);border-radius:3px"><div style="height:6px;width:58%;background:var(--coral);border-radius:3px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>🌊 Superfície</span><span style="color:var(--sandy)">29%</span></div>
+            <div style="height:6px;background:var(--surface);border-radius:3px"><div style="height:6px;width:29%;background:var(--sandy);border-radius:3px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>🌀 Spinning</span><span style="color:#4fc3f7">13%</span></div>
+            <div style="height:6px;background:var(--surface);border-radius:3px"><div style="height:6px;width:13%;background:#4fc3f7;border-radius:3px"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAVED TAB -->
+    <div id="ptab-content-saved" style="display:none">
+      <div class="sidebar-card">
+        <div class="empty-state">
+          <div class="empty-state-icon"><i class="bi bi-bookmark"></i></div>
+          <h3>Sem capturas guardadas</h3>
+          <p>Guarda capturas de outros pescadores para ver mais tarde</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FISH CATALOG PAGE ===================== -->
+<div id="page-catalog" class="page">
+  <div class="catalog-page">
+    <div class="catalog-header">
+      <div>
+        <h2 class="brand-font">Catálogo de Peixes</h2>
+        <p style="font-size:13px;color:var(--foam-muted);margin-top:2px">Espécies registadas no sistema</p>
+      </div>
+      <div class="catalog-filters" id="catalogFilters">
+        <button class="filter-chip active" onclick="filterFish('all', this)">Todos</button>
+        <button class="filter-chip" onclick="filterFish('Fundo', this)">Fundo</button>
+        <button class="filter-chip" onclick="filterFish('Superficie', this)">Superfície</button>
+        <button class="filter-chip" onclick="filterFish('Costeiro', this)">Costeiro</button>
+      </div>
+    </div>
+
+    <div class="fish-grid" id="fishGrid"></div>
+  </div>
+</div>
+
+</div><!-- end app-layout -->
+
+<!-- ===================== TOAST ===================== -->
+<div class="toast-fc" id="toast">
+  <i class="bi bi-check-circle-fill"></i>
+  <span id="toastMsg">Captura publicada com sucesso!</span>
+</div>
+
+<!-- ===================== EDIT PROFILE MODAL ===================== -->
+<div class="modal-fc" id="modal-editProfile">
+  <div class="modal-backdrop-fc" onclick="closeModal('editProfile')"></div>
+  <div class="modal-content-fc">
+    <div class="modal-header-fc">
+      <span class="modal-title-fc">Editar Perfil</span>
+      <button class="modal-close-fc" onclick="closeModal('editProfile')"><i class="bi bi-x"></i></button>
+    </div>
+    <div class="modal-body-fc">
+      <div style="text-align:center;margin-bottom:1.5rem">
+        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas&backgroundColor=1e3a5f" class="avatar-lg" alt="" style="margin-bottom:.75rem">
+        <div>
+          <button class="btn-outline-fc" style="width:auto;padding:7px 16px;font-size:12px">
+            <i class="bi bi-camera me-2"></i>Alterar foto
+          </button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="fc-label">Nome</label>
+        <input type="text" class="fc-input" value="Lucas Gonçalves">
+      </div>
+      <div class="form-group">
+        <label class="fc-label">Localização</label>
+        <input type="text" class="fc-input" placeholder="Cabedelo, Viana do Castelo">
+      </div>
+      <div class="form-group">
+        <label class="fc-label">Bio</label>
+        <textarea class="fc-textarea" style="min-height:70px">Pescador de fundo, apaixonado pela costa do Cabedelo.</textarea>
+      </div>
+    </div>
+    <div class="modal-footer-fc">
+      <button class="btn-outline-fc" style="width:auto;padding:9px 20px" onclick="closeModal('editProfile')">Cancelar</button>
+      <button class="btn-coral" style="width:auto;padding:9px 20px" onclick="closeModal('editProfile');showToast('Perfil atualizado!')">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== CAPTURE DETAIL MODAL ===================== -->
+<div class="modal-fc" id="modal-captureDetail">
+  <div class="modal-backdrop-fc" onclick="closeModal('captureDetail')"></div>
+  <div class="modal-content-fc" style="max-width:680px">
+    <div class="modal-header-fc">
+      <span class="modal-title-fc" id="detailTitle">Detalhes da Captura</span>
+      <button class="modal-close-fc" onclick="closeModal('captureDetail')"><i class="bi bi-x"></i></button>
+    </div>
+    <div class="modal-body-fc" id="detailBody"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ===================== DATA =====================
+const USERS = [
+  { id:1, nome:'Lucas Gonçalves', handle:'lucas_pesca', local:'Cabedelo', seed:'Lucas', isMe:true },
+  { id:2, nome:'Rui Boticas',     handle:'rui_pesca',   local:'Viana',    seed:'Rui' },
+  { id:3, nome:'Ana Ferreira',    handle:'ana_mar',     local:'Molhe',    seed:'Ana' },
+  { id:4, nome:'Carlos Silva',    handle:'carlos_fundo',local:'Cabedelo', seed:'Carlos' },
+  { id:5, nome:'Sofia Costa',     handle:'sofia_wave',  local:'Farol',    seed:'Sofia' },
+];
+
+const PEIXES = [
+  { id:1, nome:'Robalo',   especie:'Dicentrarchus labrax',   tipo:'Fundo',     emoji:'🐟', tamanho:45 },
+  { id:2, nome:'Carapau',  especie:'Trachurus trachurus',    tipo:'Superficie', emoji:'🐠', tamanho:22 },
+  { id:3, nome:'Linguado', especie:'Solea solea',            tipo:'Fundo',     emoji:'🐡', tamanho:35 },
+  { id:4, nome:'Polvo',    especie:'Octopus vulgaris',       tipo:'Costeiro',  emoji:'🦑', tamanho:60 },
+  { id:5, nome:'Dourada',  especie:'Sparus aurata',          tipo:'Fundo',     emoji:'🐟', tamanho:40 },
+  { id:6, nome:'Sargo',    especie:'Diplodus sargus',        tipo:'Costeiro',  emoji:'🐠', tamanho:28 },
+  { id:7, nome:'Garoupa',  especie:'Epinephelus marginatus', tipo:'Fundo',     emoji:'🐡', tamanho:55 },
+  { id:8, nome:'Sapateira',especie:'Cancer pagurus',         tipo:'Costeiro',  emoji:'🦀', tamanho:18 },
+];
+
+const CAPTURAS = [
+  {
+    id:1, userId:2, peixeId:1, local:'Cabedelo — Molhe Norte', tipo:'Fundo',
+    mare:'Baixa-mar', dataHora:'2026-04-13T07:30', qtd:2, peso:3.4,
+    obs:'Dois robalos lindos de manhã cedo! Isca viva (amêijoa). Condição do mar excelente, vento norte fresco.',
+    img:'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80',
+    comentarios:[
+      {userId:3, texto:'Que bela pescaria Rui! Que profundidade pescaste?', data:'há 2h'},
+      {userId:4, texto:'Incrível! Fui lá ontem e não apanhei nada 😅', data:'há 1h'},
+    ], likes:14, liked:false
+  },
+  {
+    id:2, userId:3, peixeId:4, local:'Cabedelo — Farol', tipo:'Mergulho',
+    mare:'Preia-mar', dataHora:'2026-04-12T16:00', qtd:1, peso:1.8,
+    obs:'Polvo enorme encontrado nas pedras do farol! Mergulho de apneia, profundidade 4 metros.',
+    img:'https://images.unsplash.com/photo-1582648696953-9fd46e2c05e9?w=600&q=80',
+    comentarios:[
+      {userId:1, texto:'Fantástico! Sempre quis experimentar apneia!', data:'há 5h'},
+    ], likes:22, liked:false
+  },
+  {
+    id:3, userId:4, peixeId:2, local:'Rio Lima — Ponte de Viana', tipo:'Cana',
+    mare:'Meia-maré', dataHora:'2026-04-11T09:00', qtd:8, peso:1.2,
+    obs:'Boa bela de carapaus! Isca artificial pequena. Rio com boa corrente depois da maré.',
+    img:'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80',
+    comentarios:[], likes:9, liked:true
+  },
+  {
+    id:4, userId:5, peixeId:5, local:'Praia da Amorosa', tipo:'Spinning',
+    mare:'Baixa-mar', dataHora:'2026-04-10T18:30', qtd:1, peso:2.1,
+    obs:'Dourada no spinning ao pôr do sol! Uma das melhores pescarias da temporada.',
+    img:'https://images.unsplash.com/photo-1504610926078-a1611febcad3?w=600&q=80',
+    comentarios:[
+      {userId:2, texto:'Spinning ao pôr do sol, que view!', data:'há 1d'},
+      {userId:3, texto:'Essa dourada está linda! Que isco usaste?', data:'há 23h'},
+    ], likes:31, liked:false
+  },
+];
+
+const STORIES_DATA = [
+  { userId:1, isMe:true },
+  { userId:2 }, { userId:3 }, { userId:4 }, { userId:5 },
+];
+
+const TOP_FISH = [
+  { nome:'Robalo', emoji:'🐟', count:18 },
+  { nome:'Carapau', emoji:'🐠', count:14 },
+  { nome:'Polvo', emoji:'🦑', count:11 },
+  { nome:'Linguado', emoji:'🐡', count:9 },
+  { nome:'Dourada', emoji:'🐟', count:7 },
+];
+
+const GRID_IMAGES = [
+  'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=300&q=80',
+  'https://images.unsplash.com/photo-1582648696953-9fd46e2c05e9?w=300&q=80',
+  'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=300&q=80',
+  'https://images.unsplash.com/photo-1504610926078-a1611febcad3?w=300&q=80',
+  'https://images.unsplash.com/photo-1534438097545-a2c22c57f2ad?w=300&q=80',
+  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&q=80',
+];
+
+// ===================== STATE =====================
+let currentStep = 1;
+let selectedMare = '';
+let currentPage = 'feed';
+
+// ===================== NAVIGATION =====================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) { page.classList.add('active'); currentPage = id; }
+  window.scrollTo(0, 0);
+
+  // Reset create form
+  if (id === 'create') { currentStep = 1; renderStep(1); updateCreateNav(); updatePreview(); }
+  if (id === 'catalog') renderFishGrid(PEIXES);
+}
+
+// ===================== AUTH =====================
+function doLogin(e) {
+  e.preventDefault();
+  showToast('Login efetuado com sucesso! Bem-vindo 🎣');
+  showPage('feed');
+}
+function doRegister(e) {
+  e.preventDefault();
+  const pw = document.getElementById('regPassword').value;
+  const cf = document.getElementById('regConfirm').value;
+  if (pw !== cf) { showToast('As passwords não coincidem!'); return; }
+  showToast('Conta criada! Bem-vindo ao FishCast 🐟');
+  showPage('feed');
+}
+function demoLogin() {
+  showToast('A entrar como convidado...');
+  setTimeout(() => showPage('feed'), 800);
+}
+
+// ===================== FEED RENDER =====================
+function renderFeed() {
+  // STORIES
+  const storiesBar = document.getElementById('storiesBar');
+  storiesBar.innerHTML = '';
+  STORIES_DATA.forEach(s => {
+    const u = USERS.find(x => x.id === s.userId);
+    const div = document.createElement('div');
+    div.className = 'story-item';
+    if (s.isMe) {
+      div.innerHTML = `
+        <div class="story-ring add-story">
+          <div class="add-icon"><i class="bi bi-plus-circle-fill"></i></div>
+        </div>
+        <span class="story-name">A minha</span>`;
+    } else {
+      div.innerHTML = `
+        <div class="story-ring">
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${u.seed}&backgroundColor=1e3a5f" alt="">
+        </div>
+        <span class="story-name">${u.nome.split(' ')[0]}</span>`;
+    }
+    storiesBar.appendChild(div);
+  });
+
+  // CARDS
+  const feedCards = document.getElementById('feedCards');
+  feedCards.innerHTML = '';
+  CAPTURAS.forEach(c => {
+    const user = USERS.find(u => u.id === c.userId);
+    const peixe = PEIXES.find(p => p.id === c.peixeId);
+    const dt = new Date(c.dataHora);
+    const now = new Date();
+    const diffH = Math.round((now - dt) / 3600000);
+    const timeAgo = diffH < 24 ? `há ${diffH}h` : `há ${Math.round(diffH/24)}d`;
+    const tideIcon = c.mare === 'Preia-mar' ? '🔼' : c.mare === 'Baixa-mar' ? '🔽' : '〰️';
+
+    const card = document.createElement('div');
+    card.className = 'capture-card';
+    card.innerHTML = `
+      <div class="card-header-fc">
+        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${user.seed}&backgroundColor=1e3a5f" class="avatar-md" alt="">
+        <div class="card-user-info">
+          <div class="card-user-name">${user.nome}</div>
+          <div class="card-meta">
+            <span>@${user.handle}</span>
+            <span>·</span>
+            <span>${timeAgo}</span>
+          </div>
+        </div>
+        <button style="background:none;border:none;color:var(--foam-muted);cursor:pointer;font-size:18px">
+          <i class="bi bi-three-dots"></i>
+        </button>
+      </div>
+      <div class="card-image-wrap" onclick="openCaptureDetail(${c.id})">
+        <img src="${c.img}" alt="Captura" loading="lazy">
+        <div class="card-fish-badge">${peixe.emoji} ${peixe.nome}</div>
+        <div class="card-stats-bar">
+          <span class="stat-pill"><i class="bi bi-geo-alt"></i>${c.local.split('—')[0].trim()}</span>
+          <span class="stat-pill"><i class="bi bi-arrow-down-up"></i>${tideIcon} ${c.mare}</span>
+          <span class="stat-pill"><i class="bi bi-tools"></i>${c.tipo}</span>
+        </div>
+      </div>
+      <div class="card-body-fc">
+        <div class="card-obs">
+          <span style="font-weight:600;color:var(--foam)">${user.nome.split(' ')[0]}</span>
+          ${c.obs}
+        </div>
+        <div style="display:flex;gap:12px;font-size:12px;color:var(--foam-muted);margin-bottom:8px">
+          ${c.qtd ? `<span>🐟 ${c.qtd} exemplar${c.qtd>1?'es':''}</span>` : ''}
+          ${c.peso ? `<span>⚖️ ${c.peso}kg</span>` : ''}
+          <span>📅 ${dt.toLocaleDateString('pt-PT')}</span>
+        </div>
+        <div class="card-actions">
+          <button class="action-btn ${c.liked?'liked':''}" id="like-${c.id}" onclick="toggleLike(${c.id})">
+            <i class="bi bi-heart${c.liked?'-fill':''}"></i>
+            <span id="likes-count-${c.id}">${c.likes}</span>
+          </button>
+          <button class="action-btn" onclick="toggleComments(${c.id})">
+            <i class="bi bi-chat"></i>
+            <span>${c.comentarios.length}</span>
+          </button>
+          <button class="action-btn">
+            <i class="bi bi-share"></i>
+          </button>
+          <button class="action-btn">
+            <i class="bi bi-bookmark"></i>
+          </button>
+        </div>
+      </div>
+      <div class="comment-section" id="comments-${c.id}" style="display:none">
+        ${c.comentarios.map(cm => {
+          const cu = USERS.find(u => u.id === cm.userId);
+          return `<div class="comment-item">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${cu.seed}&backgroundColor=1e3a5f" class="avatar-sm" style="width:28px;height:28px" alt="">
+            <div class="comment-bubble">
+              <div class="comment-author">${cu.nome.split(' ')[0]}</div>
+              <div class="comment-text">${cm.texto}</div>
+            </div>
+          </div>`;
+        }).join('')}
+        <div class="comment-input-wrap">
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas&backgroundColor=1e3a5f" class="avatar-sm" style="width:28px;height:28px" alt="">
+          <input class="comment-input" placeholder="Adicionar comentário..." id="comment-input-${c.id}" onkeypress="handleCommentKey(event, ${c.id})">
+          <button class="comment-send" onclick="addComment(${c.id})"><i class="bi bi-send-fill"></i></button>
+        </div>
+      </div>`;
+    feedCards.appendChild(card);
+  });
+
+  // SIDEBAR
+  renderSidebar();
+}
+
+function renderSidebar() {
+  // Suggestions
+  const sg = document.getElementById('suggestionsContainer');
+  sg.innerHTML = '';
+  USERS.filter(u => !u.isMe).slice(0,4).forEach(u => {
+    sg.innerHTML += `
+      <div class="suggestion-item">
+        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${u.seed}&backgroundColor=1e3a5f" class="avatar-md" style="width:36px;height:36px" alt="">
+        <div class="suggestion-info">
+          <div class="suggestion-name">${u.nome}</div>
+          <div class="suggestion-sub">@${u.handle} · ${u.local}</div>
+        </div>
+        <button class="btn-follow" onclick="toggleFollow(this)">Seguir</button>
+      </div>`;
+  });
+
+  // Top fish
+  const tf = document.getElementById('topFishContainer');
+  tf.innerHTML = '';
+  TOP_FISH.forEach((f, i) => {
+    tf.innerHTML += `
+      <div class="top-fish-item">
+        <span class="fish-rank">${i+1}</span>
+        <span style="font-size:16px;margin-right:6px">${f.emoji}</span>
+        <span class="fish-name">${f.nome}</span>
+        <span class="fish-count">${f.count} capts.</span>
+      </div>`;
+  });
+}
+
+// INTERACTIONS
+function toggleLike(id) {
+  const c = CAPTURAS.find(x => x.id === id);
+  c.liked = !c.liked;
+  c.likes += c.liked ? 1 : -1;
+  const btn = document.getElementById('like-' + id);
+  const cnt = document.getElementById('likes-count-' + id);
+  btn.className = 'action-btn ' + (c.liked ? 'liked' : '');
+  btn.querySelector('i').className = 'bi bi-heart' + (c.liked ? '-fill' : '');
+  cnt.textContent = c.likes;
+}
+
+function toggleComments(id) {
+  const el = document.getElementById('comments-' + id);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function addComment(id) {
+  const inp = document.getElementById('comment-input-' + id);
+  const text = inp.value.trim();
+  if (!text) return;
+  const c = CAPTURAS.find(x => x.id === id);
+  c.comentarios.push({ userId:1, texto:text, data:'agora' });
+  inp.value = '';
+  renderFeed();
+  setTimeout(() => {
+    document.getElementById('comments-' + id).style.display = 'block';
+    toggleLike; // ensure re-render works
+  }, 50);
+}
+
+function handleCommentKey(e, id) { if (e.key === 'Enter') addComment(id); }
+
+function toggleFollow(btn) {
+  const f = btn.classList.contains('following');
+  btn.classList.toggle('following', !f);
+  btn.textContent = f ? 'Seguir' : 'A seguir';
+}
+
+// CAPTURE DETAIL
+function openCaptureDetail(id) {
+  const c = CAPTURAS.find(x => x.id === id);
+  const peixe = PEIXES.find(p => p.id === c.peixeId);
+  const user = USERS.find(u => u.id === c.userId);
+  const dt = new Date(c.dataHora);
+  const tideIcon = c.mare === 'Preia-mar' ? '🔼' : c.mare === 'Baixa-mar' ? '🔽' : '〰️';
+
+  document.getElementById('detailTitle').textContent = `${peixe.emoji} ${peixe.nome} — ${user.nome.split(' ')[0]}`;
+  document.getElementById('detailBody').innerHTML = `
+    <img src="${c.img}" style="width:100%;border-radius:12px;margin-bottom:1rem;aspect-ratio:16/9;object-fit:cover" alt="">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem">
+      <div style="background:var(--surface);border-radius:10px;padding:12px">
+        <div style="font-size:10px;color:var(--foam-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Peixe</div>
+        <div style="font-size:15px;font-weight:700;color:var(--foam)">${peixe.emoji} ${peixe.nome}</div>
+        <div style="font-size:11px;color:var(--foam-muted);font-style:italic">${peixe.especie}</div>
+      </div>
+      <div style="background:var(--surface);border-radius:10px;padding:12px">
+        <div style="font-size:10px;color:var(--foam-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Local</div>
+        <div style="font-size:13px;font-weight:600;color:var(--foam)">📍 ${c.local}</div>
+      </div>
+      <div style="background:var(--surface);border-radius:10px;padding:12px">
+        <div style="font-size:10px;color:var(--foam-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Quantidade</div>
+        <div style="font-size:20px;font-weight:700;color:var(--coral)">${c.qtd} <span style="font-size:13px">exemplares</span></div>
+      </div>
+      <div style="background:var(--surface);border-radius:10px;padding:12px">
+        <div style="font-size:10px;color:var(--foam-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Peso</div>
+        <div style="font-size:20px;font-weight:700;color:var(--sandy)">${c.peso} <span style="font-size:13px">kg</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+      <span style="background:var(--surface);border-radius:16px;padding:5px 12px;font-size:12px;color:var(--foam)">${tideIcon} ${c.mare}</span>
+      <span style="background:var(--surface);border-radius:16px;padding:5px 12px;font-size:12px;color:var(--foam)">🎣 ${c.tipo}</span>
+      <span style="background:var(--surface);border-radius:16px;padding:5px 12px;font-size:12px;color:var(--foam)">📅 ${dt.toLocaleDateString('pt-PT')} ${dt.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'})}</span>
+    </div>
+    <div style="font-size:14px;color:var(--foam);line-height:1.6;margin-bottom:1rem">
+      <span style="font-weight:600">${user.nome.split(' ')[0]}</span> ${c.obs}
+    </div>`;
+  openModal('captureDetail');
+}
+
+// ===================== FISH CATALOG =====================
+function renderFishGrid(list) {
+  const grid = document.getElementById('fishGrid');
+  grid.innerHTML = '';
+  list.forEach(p => {
+    const tagClass = p.tipo === 'Fundo' ? 'tag-fundo' : p.tipo === 'Superficie' ? 'tag-superficie' : 'tag-costeiro';
+    const div = document.createElement('div');
+    div.className = 'fish-card';
+    div.innerHTML = `
+      <div class="fish-card-img">${p.emoji}</div>
+      <div class="fish-card-body">
+        <div class="fish-card-name">${p.nome}</div>
+        <div class="fish-card-species">${p.especie}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+          <span class="fish-card-tag ${tagClass}">${p.tipo}</span>
+          <span style="font-size:11px;color:var(--foam-muted)">≈${p.tamanho}cm</span>
+        </div>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+
+function filterFish(tipo, btn) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const list = tipo === 'all' ? PEIXES : PEIXES.filter(p => p.tipo === tipo);
+  renderFishGrid(list);
+}
+
+// ===================== PROFILE GRID =====================
+function renderProfileGrid() {
+  const grid = document.getElementById('ptab-content-grid');
+  grid.innerHTML = '';
+  GRID_IMAGES.forEach((img, i) => {
+    const c = CAPTURAS[i % CAPTURAS.length];
+    const p = PEIXES.find(x => x.id === c.peixeId);
+    const div = document.createElement('div');
+    div.className = 'grid-item';
+    div.innerHTML = `
+      <img src="${img}" alt="" loading="lazy">
+      <div class="grid-item-overlay">
+        <span style="font-size:1.2rem">${p.emoji}</span>
+        <span>${p.nome}</span>
+        <span style="font-size:11px">❤️ ${c.likes}</span>
+      </div>`;
+    div.onclick = () => openCaptureDetail(c.id);
+    grid.appendChild(div);
+  });
+}
+
+function switchProfileTab(tab) {
+  ['grid','stats','saved'].forEach(t => {
+    document.getElementById('ptab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('ptab-content-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  if (tab === 'grid') document.getElementById('ptab-content-grid').style.display = 'grid';
+}
+
+// ===================== CREATE CAPTURE =====================
+function renderStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('step-' + i).classList.toggle('active', i === n);
+    const tab = document.getElementById('step-tab-' + i);
+    tab.classList.toggle('active', i === n);
+    tab.classList.toggle('done', i < n);
+    const num = document.getElementById('step-num-' + i);
+    num.innerHTML = i < n ? '<i class="bi bi-check"></i>' : i;
+  }
+  currentStep = n;
+  updateCreateNav();
+  if (n === 3) updatePreview();
+}
+
+function updateCreateNav() {
+  const back = document.getElementById('btnBack');
+  const next = document.getElementById('btnNext');
+  back.style.display = currentStep > 1 ? 'block' : 'none';
+  if (currentStep === 3) {
+    next.innerHTML = '<i class="bi bi-send-fill me-2"></i>Publicar Captura';
+    next.onclick = submitCaptura;
+  } else {
+    next.innerHTML = 'Próximo <i class="bi bi-arrow-right ms-2"></i>';
+    next.onclick = nextStep;
+  }
+}
+
+function nextStep() {
+  if (currentStep < 3) renderStep(currentStep + 1);
+}
+function prevStep() {
+  if (currentStep > 1) renderStep(currentStep - 1);
+}
+function goStep(n) {
+  if (n <= currentStep || n === currentStep + 1) renderStep(n);
+}
+
+function triggerFileInput() {
+  document.getElementById('photoInput').click();
+}
+function handlePhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('photoPreviewImg').src = ev.target.result;
+    document.getElementById('photoDrop').style.display = 'none';
+    document.getElementById('photoPreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+function removePhoto() {
+  document.getElementById('photoInput').value = '';
+  document.getElementById('photoDrop').style.display = 'block';
+  document.getElementById('photoPreview').style.display = 'none';
+}
+
+function selectMare(val) {
+  selectedMare = val;
+  ['preia','baixa','meia'].forEach(k => document.getElementById('mare-' + k).classList.remove('selected'));
+  const map = { 'Preia-mar':'preia', 'Baixa-mar':'baixa', 'Meia-maré':'meia' };
+  document.getElementById('mare-' + map[val]).classList.add('selected');
+}
+
+function updatePreview() {
+  const peixeEl = document.getElementById('peixeSelect');
+  const peixeText = peixeEl.options[peixeEl.selectedIndex]?.text || '—';
+  const local = document.getElementById('localInput').value || '—';
+  const tipo = document.getElementById('tipoPescaSelect').value || '—';
+  const qtd = document.getElementById('qtdInput').value || '—';
+  const peso = document.getElementById('pesoInput').value || '—';
+  const data = document.getElementById('dataInput').value;
+  const dataStr = data ? new Date(data).toLocaleString('pt-PT') : '—';
+
+  document.getElementById('previewSummary').innerHTML = `
+    🐟 <b>Peixe:</b> ${peixeText.split('—')[0].trim()}<br>
+    📍 <b>Local:</b> ${local}<br>
+    🎣 <b>Tipo de pesca:</b> ${tipo}<br>
+    ${selectedMare ? `〰️ <b>Maré:</b> ${selectedMare}<br>` : ''}
+    ${qtd !== '—' ? `🔢 <b>Quantidade:</b> ${qtd} exemplar(es)<br>` : ''}
+    ${peso !== '—' ? `⚖️ <b>Peso:</b> ${peso}kg<br>` : ''}
+    📅 <b>Data/hora:</b> ${dataStr}`;
+}
+
+function submitCaptura() {
+  showPage('feed');
+  setTimeout(() => showToast('🎣 Captura publicada com sucesso!'), 300);
+}
+
+// ===================== MODAL =====================
+function openModal(id) {
+  document.getElementById('modal-' + id).classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById('modal-' + id).classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// ===================== TOAST =====================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', () => {
+  // Default datetime
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  const el = document.getElementById('dataInput');
+  if (el) el.value = now.toISOString().slice(0, 16);
+
+  renderFeed();
+  renderProfileGrid();
+  renderFishGrid(PEIXES);
+});
+
+// Close modals with ESC
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-fc.show').forEach(m => {
+      m.classList.remove('show');
+      document.body.style.overflow = '';
+    });
+  }
+});
+</script>
+</body>
+</html>

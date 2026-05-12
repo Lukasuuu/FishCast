@@ -1,0 +1,45 @@
+@model IEnumerable<FishCast.Models.Captura>
+
+@{
+    ViewData["Title"] = "Minhas Capturas - FishCast";
+}
+
+<div class="profile-page">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: var(--foam); font-family: 'Playfair Display', serif;">
+            <i class="bi bi-collection"></i> Minhas Capturas
+        </h2>
+        <a asp-action="Create" class="btn-coral" style="width: auto;">
+            <i class="bi bi-plus-lg"></i> Nova Captura
+        </a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="capture-grid">
+            @foreach (var item in Model)
+            {
+                <a asp-action="Details" asp-route-id="@item.Id" class="grid-item text-decoration-none">
+                    <img src="@item.ImagemPath" alt="@item.Titulo" onerror="this.src='/images/default-captura.svg'">
+                    <div class="grid-item-overlay">
+                        <i class="bi bi-water"></i>
+                        <span>@(item.PesoKg?.ToString("F1") ?? "?") kg</span>
+                        <i class="bi bi-chat"></i>
+                        <span>@item.Comentarios.Count</span>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">🎣</div>
+            <h3>Ainda não tem capturas</h3>
+            <p>Partilhe a sua primeira pescaria com a comunidade!</p>
+            <a asp-action="Create" class="btn-coral mt-3" style="width: auto; display: inline-flex;">
+                <i class="bi bi-camera"></i> Publicar Captura
+            </a>
+        </div>
+    }
+</div>
